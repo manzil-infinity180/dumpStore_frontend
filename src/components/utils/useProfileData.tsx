@@ -1,7 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import { getMyProfile, IBookMark } from "./http";
 import { useQuery } from "@tanstack/react-query";
-interface IProfileData {
+import Loader from "./Loader";
+export interface IProfileData {
   _id: string;
   id: string;
   displayName: string;
@@ -10,20 +11,21 @@ interface IProfileData {
   posts: IBookMark[];
   topics?: string[];
 }
+export type IPost = IBookMark;
 export const ProfileDataContext = createContext<IProfileData | null>(null);
 export function UserProfileData({ children }: { children: React.ReactNode }) {
-  const [valuex, setValuex] = useState<IProfileData | null>(null);
-  const data = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const data = await getMyProfile();
-      setValuex(data as IProfileData);
-      return data;
+      const profile = await getMyProfile();
+      return profile as IProfileData;
     },
   });
 
+  if (isLoading) return <Loader />;
+  if (error) return <div>Error fetching profile data.</div>;
   return (
-    <ProfileDataContext.Provider value={valuex as IProfileData}>
+    <ProfileDataContext.Provider value={data || null}>
       {children}
     </ProfileDataContext.Provider>
   );

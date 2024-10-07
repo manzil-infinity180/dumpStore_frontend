@@ -14,7 +14,7 @@ function BookmarkCard({ data }: { data: IBookMark }) {
   }
   return (
     <div
-      className="border pt-4 pb-4 px-2 bg-slate-100 flex flex-col  rounded-xl cursor-pointer my-3"
+      className="border pt-4 pb-4 px-2 bg-slate-100 flex flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96"
       //   onClick={() => window.open(data.link)}
     >
       <Link to={data.link} target="_blank">
@@ -46,7 +46,7 @@ function BookmarkCard({ data }: { data: IBookMark }) {
         </div>
       </div>
       <div
-        className="flex justify-end items-end opacity-40 mt-2 mr-1"
+        className="flex justify-end items-end opacity-40"
         onClick={() => navigate(`/edit/${data._id}`)}
       >
         <TbEdit className="text-xl mr-1" />

@@ -9,6 +9,8 @@ import CreateBookmark from "./components/EditBookMark/CreateBookmark";
 import SignUp from "./components/Auth/SignUp";
 import { queryclient } from "./components/utils/http";
 import { UserProfileData } from "./components/utils/useProfileData";
+import Loader from "./components/utils/Loader";
+import TopicsCard from "./components/ui/TopicsCard";
 function App() {
   const router = createBrowserRouter([
     // {
@@ -21,7 +23,11 @@ function App() {
     },
     {
       path: "*",
-      element: <AllBookMark />,
+      element: (
+        <UserProfileData>
+          <AllBookMark />
+        </UserProfileData>
+      ),
     },
     {
       path: "/login",
@@ -33,19 +39,33 @@ function App() {
     },
     {
       path: "/create",
-      element: <CreateBookmark />,
+      element: (
+        <UserProfileData>
+          <CreateBookmark />
+        </UserProfileData>
+      ),
     },
     {
       path: "/edit/:bookmarkID",
-      element: <UpdateBookmark />,
+      element: (
+        <UserProfileData>
+          <UpdateBookmark />
+        </UserProfileData>
+      ),
     },
+    {
+      path: "/loader",
+      element: <Loader />,
+    },
+    // {
+    //   path: "/topics",
+    //   element: <TopicsCard />,
+    // },
   ]);
   return (
     <>
       <QueryClientProvider client={queryclient}>
-        <UserProfileData>
-          <RouterProvider router={router} />
-        </UserProfileData>
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </>
   );

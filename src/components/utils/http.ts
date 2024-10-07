@@ -175,6 +175,32 @@ export async function getMyProfile() {
   console.log(data);
   return data;
 }
+export async function getBookMarkByTopic(post: string) {
+  const url = `${server}/api/get-bookmark-by-topics`;
+  console.log(post);
+  // console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify({ topics: post }),
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  console.log(data);
+  return data;
+}
 
 export async function deleteBookmark(bookmarkID: string) {
   console.log(bookmarkID);

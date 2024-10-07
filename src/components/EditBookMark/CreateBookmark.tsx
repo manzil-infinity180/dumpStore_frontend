@@ -1,6 +1,8 @@
-import { useState, ChangeEvent } from "react";
-import { createBookmark } from "../utils/http";
+import { useState, ChangeEvent, useEffect } from "react";
+import { createBookmark, queryclient } from "../utils/http";
 import { useMutation } from "@tanstack/react-query";
+import { useProfileData } from "../utils/useProfileData";
+import { useNavigate } from "react-router-dom";
 
 export default function UpdateBookmark() {
   const [title, setTitle] = useState("");
@@ -11,18 +13,21 @@ export default function UpdateBookmark() {
   const [image, setImage] = useState<File | null>(null);
   const [selectedTopics, setSelectedTopics] = useState("");
   const [customTopics, setCustomTopics] = useState("");
-  const [topics, setTopics] = useState([
-    "Volvo (Latin for 'I roll')",
-    "Saab (Swedish Aeroplane AB)",
-    "Mercedes (Mercedes-Benz)",
-    "Audi (Auto Union Deutschland Ingolstadt)",
-  ]);
+  const [topics, setTopics] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const profileData = useProfileData();
+  useEffect(() => {
+    if (profileData && profileData.topics) {
+      setTopics(profileData.topics);
+    }
+  }, [profileData]);
   const { mutate } = useMutation({
     mutationFn: createBookmark,
     onSuccess: () => {
-      // toast.success("Registration Successfully");
-      // navigate("/verify");
-      console.log("Created Yuppp!!!");
+      navigate("/");
+    },
+    onSettled: () => {
+      queryclient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
   function isValidHttpUrl(string: string) {

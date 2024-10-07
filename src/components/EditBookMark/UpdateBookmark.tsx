@@ -1,11 +1,17 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import { GrUpdate } from "react-icons/gr";
 import { MdDeleteForever } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
-import { deleteBookmark, getBookMark, updateBookmark } from "../utils/http";
+import {
+  deleteBookmark,
+  getBookMark,
+  queryclient,
+  updateBookmark,
+} from "../utils/http";
 import { useNavigate, useParams } from "react-router-dom";
 import { IBookMark } from "../AllBookMark";
+import { useProfileData } from "../utils/useProfileData";
 
 export default function UpdateBookmark() {
   const [title, setTitle] = useState("");
@@ -30,13 +36,19 @@ export default function UpdateBookmark() {
     updatedAt: new Date(),
     topics: "",
   });
-
+  const profileData = useProfileData();
+  useEffect(() => {
+    if (profileData && profileData.topics) {
+      setTopics(profileData.topics);
+    }
+  }, [profileData]);
   const { mutate } = useMutation({
     mutationFn: updateBookmark,
     onSuccess: () => {
-      // toast.success("Registration Successfully");
-      // navigate("/verify");
-      console.log("Created Yuppp!!!");
+      navigate("/");
+    },
+    onSettled: () => {
+      queryclient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
   const { data } = useQuery({
