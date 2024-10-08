@@ -14,10 +14,7 @@ import { IBookMark } from "../AllBookMark";
 import { useProfileData } from "../utils/useProfileData";
 
 export default function UpdateBookmark() {
-  const [title, setTitle] = useState("");
-  const [link, setLink] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tag1, setTags1] = useState<string>("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imageURL, setImageURL] = useState("");

@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import _BookmarkCard from "./ui/BookmarkCard";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { GrAddCircle } from "react-icons/gr";
 import { getAllBookmark } from "./utils/http";
-import { IProfileData, useProfileData } from "./utils/useProfileData";
+import { useProfileData } from "./utils/useProfileData";
 import TopicsCard from "./ui/TopicsCard";
 import { useNavigate } from "react-router-dom";
 import Loader from "./utils/Loader";
+import SearchField from "./ui/SearchField";
 export interface IBookMark {
   _id: string;
   title: string;
@@ -50,6 +51,7 @@ function AllBookMark() {
   });
   return (
     <>
+      <SearchField setBookmark={setBookmark} />
       <div className="flex flex-row w-full">
         <div className="min-w-0 max-w-96 flex flex-col  bg-blue-100 min-h-screen ">
           <div className="mx-2 px-2 my-2">

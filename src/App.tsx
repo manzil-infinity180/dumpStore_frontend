@@ -11,6 +11,7 @@ import { queryclient } from "./components/utils/http";
 import { UserProfileData } from "./components/utils/useProfileData";
 import Loader from "./components/utils/Loader";
 import TopicsCard from "./components/ui/TopicsCard";
+import SearchField from "./components/ui/SearchField";
 function App() {
   const router = createBrowserRouter([
     // {
@@ -54,8 +55,8 @@ function App() {
       ),
     },
     {
-      path: "/loader",
-      element: <Loader />,
+      path: "/search",
+      element: <SearchField />,
     },
     // {
     //   path: "/topics",

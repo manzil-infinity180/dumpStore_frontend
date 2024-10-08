@@ -202,6 +202,35 @@ export async function getBookMarkByTopic(post: string) {
   return data;
 }
 
+export async function getBookmarkFromSearch(post: {
+  [k: string]: FormDataEntryValue;
+}) {
+  const url = `${server}/api/search-bookmark`;
+  console.log(post);
+  // console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(post),
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  console.log(data);
+  return data;
+}
+
 export async function deleteBookmark(bookmarkID: string) {
   console.log(bookmarkID);
   const url = `${server}/api/delete-bookmark/${bookmarkID}`;
