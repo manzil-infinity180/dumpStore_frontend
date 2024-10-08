@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import React, { SetStateAction } from "react";
 import { getBookMarkByTopic } from "../utils/http";
 import { IBookMark } from "../AllBookMark";

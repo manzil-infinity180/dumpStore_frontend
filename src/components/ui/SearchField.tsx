@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import React, { SetStateAction, useState } from "react";
-import { getBookmarkFromSearch, queryclient } from "../utils/http";
+import { getBookmarkFromSearch } from "../utils/http";
 import { IBookMark } from "../AllBookMark";
 interface ISearchField {
   setBookmark: React.Dispatch<SetStateAction<IBookMark[]>>;
