@@ -1,4 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
+import React from "react";
+import { NavigateFunction } from "react-router-dom";
 export const queryclient = new QueryClient();
 const server = "http://localhost:3008";
 class APIError extends Error {
@@ -152,7 +154,7 @@ export async function getAllBookmark() {
   console.log(data);
   return data;
 }
-export async function getMyProfile() {
+export async function getMyProfile(navigate: NavigateFunction) {
   const url = `${server}/api/get-my-profile`;
   // console.log(JSON.stringify(post));
   const res = await fetch(url, {
@@ -169,6 +171,7 @@ export async function getMyProfile() {
       res.status,
       info
     );
+    navigate("/login");
     throw error;
   }
   const { data } = await res.json();
@@ -229,6 +232,26 @@ export async function getBookmarkFromSearch(post: {
   const { data } = await res.json();
   console.log(data);
   return data;
+}
+
+export async function logout(navigate: NavigateFunction) {
+  const url = `${server}/api/logout`;
+  // console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  await res.json();
+  navigate("/login");
 }
 
 export async function deleteBookmark(bookmarkID: string) {

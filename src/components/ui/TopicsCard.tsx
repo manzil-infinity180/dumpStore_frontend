@@ -25,7 +25,7 @@ function TopicsCard({ topics, setBookmark }: ITopicsCard) {
     <>
       {topics && (
         <div
-          className="mx-2 px-2 bg-slate-900 rounded-2xl my-2 cursor-pointer"
+          className="mx-2 px-2 bg-slate-800 rounded-2xl my-2 cursor-pointer"
           onClick={handleFunction}
         >
           <h3 className="p-1 max-w-64 break-words text-white ">{topics}</h3>

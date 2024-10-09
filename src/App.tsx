@@ -9,18 +9,12 @@ import CreateBookmark from "./components/EditBookMark/CreateBookmark";
 import SignUp from "./components/Auth/SignUp";
 import { queryclient } from "./components/utils/http";
 import { UserProfileData } from "./components/utils/useProfileData";
-import SearchField from "./components/ui/SearchField";
-import Navbar from "./components/ui/Navbar";
+import { useEffect } from "react";
 function App() {
+  useEffect(() => {
+    // check is application is logined or not if it is not then redirect to login page
+  });
   const router = createBrowserRouter([
-    // {
-    //   path: "*",
-    //   element: <Home />,
-    // },
-    {
-      path: "/demo",
-      element: <Demo />,
-    },
     {
       path: "*",
       element: (
@@ -52,10 +46,6 @@ function App() {
           <UpdateBookmark />
         </UserProfileData>
       ),
-    },
-    {
-      path: "/nav",
-      element: <Navbar />,
     },
     // {
     //   path: "/topics",

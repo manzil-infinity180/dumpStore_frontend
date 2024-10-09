@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import _BookmarkCard from "./ui/BookmarkCard";
 import { useQuery } from "@tanstack/react-query";
 import { GrAddCircle } from "react-icons/gr";
@@ -8,6 +8,7 @@ import TopicsCard from "./ui/TopicsCard";
 import { useNavigate } from "react-router-dom";
 import Loader from "./utils/Loader";
 import SearchField from "./ui/SearchField";
+import Navbar from "./ui/Navbar";
 export interface IBookMark {
   _id: string;
   title: string;
@@ -51,16 +52,19 @@ function AllBookMark() {
   });
   return (
     <>
-      <SearchField setBookmark={setBookmark} />
+      <Navbar login={true} />
+      <div className="ml-24">
+        <SearchField setBookmark={setBookmark} />
+      </div>
       <div className="flex flex-row w-full">
-        <div className="min-w-0 max-w-96 flex flex-col  bg-blue-100 min-h-screen ">
+        <div className="min-w-0 max-w-96 flex flex-col min-h-screen  bg-blue-100 bg-opacity-35 ml-4 rounded-lg shadow-2xl transition-all duration-300">
           <div className="mx-2 px-2 my-2">
             <h3 className="p-1 max-w-64 break-words text-center bold text-lg">
               TOPICS
             </h3>
           </div>
           <div
-            className="mx-2 px-2 bg-slate-900 rounded-2xl my-2 cursor-pointer"
+            className="mx-2 px-2 bg-slate-900 rounded-2xl my-2 cursor-pointer bg-opacity-80"
             onClick={() => navigate("/create")}
           >
             <div className="p-1 max-w-64 break-words text-white flex flex-col justify-center items-center">
@@ -71,7 +75,7 @@ function AllBookMark() {
             </div>
           </div>
           <div
-            className="mx-2 px-2 bg-slate-900 rounded-2xl my-2 cursor-pointer"
+            className="mx-2 px-2 bg-red-600 rounded-2xl my-2 cursor-pointer bg-opacity-75"
             onClick={() => refetch()}
           >
             <h3 className="p-1 max-w-64 break-words text-white ">Reset</h3>

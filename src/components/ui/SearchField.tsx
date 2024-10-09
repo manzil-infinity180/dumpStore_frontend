@@ -31,19 +31,21 @@ function SearchField({ setBookmark }: ISearchField) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex justify-center items-center mt-4 flex-col"
+      className="flex justify-center items-center mt-4 flex-col ml-10"
     >
       <input
         type="text"
         placeholder="Search Your Bookmark"
         name="searchField"
-        className="w-1/3 rounded-3xl px-6 py-2 border-2 border-black outline-slate-900"
+        className="w-1/2 rounded-3xl px-6 py-2 border-2 border-black outline-slate-900 shadow-xl"
         value={searchField}
         onChange={(e) => setSearchField(e.target.value)}
+        required
+        autoComplete="off"
       />
       <button
         type="submit"
-        className="border-2 border-black my-3 px-10 py-2 rounded-3xl bg-blue-500 shadow-lg hover:bg-blue-300"
+        className="border-2 border-black my-3 px-10 py-2 rounded-3xl bg-blue-500 shadow-xl hover:bg-blue-400"
       >
         Search
       </button>
