@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // import Home from "./components/Home";
 import { QueryClientProvider } from "@tanstack/react-query";
-import Demo from "./components/Demo";
 import AllBookMark from "./components/AllBookMark";
 import Login from "./components/Auth/Login";
 import UpdateBookmark from "./components/EditBookMark/UpdateBookmark";

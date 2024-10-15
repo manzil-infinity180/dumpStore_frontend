@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import _BookmarkCard from "./ui/BookmarkCard";
 import { useQuery } from "@tanstack/react-query";
 import { GrAddCircle } from "react-icons/gr";

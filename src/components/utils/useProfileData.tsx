@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import { getMyProfile, IBookMark } from "./http";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "./Loader";
