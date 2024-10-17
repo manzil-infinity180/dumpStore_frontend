@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, useEffect } from "react";
-import { createBookmark, queryclient } from "../utils/http";
+import { createBookmark, queryclient, uploadImageToCloud } from "../utils/http";
 import { useMutation } from "@tanstack/react-query";
 import { useProfileData } from "../utils/useProfileData";
 import { useNavigate } from "react-router-dom";
@@ -11,9 +11,11 @@ export default function UpdateBookmark() {
   const [tag1, setTags1] = useState<string>("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
+  const [cloudImage, setCloudImage] = useState<string>("");
   const [selectedTopics, setSelectedTopics] = useState("");
   const [customTopics, setCustomTopics] = useState("");
   const [topics, setTopics] = useState<string[]>([]);
+  const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
   const navigate = useNavigate();
   const profileData = useProfileData();
   useEffect(() => {
@@ -30,6 +32,17 @@ export default function UpdateBookmark() {
       queryclient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
+  const { mutate: UploadImageMutate } = useMutation({
+    mutationFn: uploadImageToCloud,
+    onSuccess: (uploadImageUrl) => {
+      console.log("Yeah bro upload it!!!!!!!!");
+      const { imageUrl } = uploadImageUrl;
+      if (imageUrl.length) {
+        setCloudImage(imageUrl);
+        setuploadDisableBtn(false);
+      }
+    },
+  });
   function isValidHttpUrl(string: string) {
     const url = new URL(string);
     return url.protocol === "http:" || url.protocol === "https:";
@@ -39,19 +52,36 @@ export default function UpdateBookmark() {
     // Handle form submission here
     console.log({ title, link, description, image });
     const formdata = new FormData(e.currentTarget);
+    if (tag1.length) {
+      const arr = [...tags, tag1];
+      console.log(arr);
+      setTags(arr);
+      console.log(tags);
+    }
     formdata.append("tag", tags.join(","));
+    if (cloudImage.length) {
+      console.log(cloudImage);
+      formdata.append("image", cloudImage);
+    }
     console.log(tags);
+    console.log(tag1);
     console.log(formdata);
-    const data = Object.fromEntries(formdata);
+    const filteredData = Object.fromEntries(formdata.entries());
+    Object.keys(filteredData).forEach(
+      (key) => filteredData[key] === "" && delete filteredData[key]
+    );
+    console.log(filteredData);
 
-    console.log(JSON.stringify(data));
-    mutate(data);
+    console.log(JSON.stringify(filteredData));
+    mutate(filteredData);
     console.log(import.meta.env.VITE_LOGO_FAVICON_URL);
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
+      setuploadDisableBtn(true);
+      console.log(image);
     }
   };
   const handleTopicsChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -77,6 +107,8 @@ export default function UpdateBookmark() {
       !tags.includes(e.currentTarget.value)
     ) {
       setTags([...tags, e.currentTarget.value]);
+      console.log(tags);
+      console.log(e.currentTarget.value);
       e.currentTarget.value = "";
       setTags1("");
     }
@@ -85,6 +117,27 @@ export default function UpdateBookmark() {
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
+  const handleImageUpload = () => {
+    console.log(image);
+    if (image !== null) {
+      const formdata = new FormData();
+      console.log(image);
+      formdata.append("photo", image);
+      console.log(formdata.getAll("photo"));
+      console.log(formdata);
+      const category = Object.fromEntries(formdata);
+      if (!category) {
+        throw new Error("Something went work");
+      }
+      setuploadDisableBtn(true);
+      UploadImageMutate(formdata);
+    }
+  };
+  const handleRemoveImage = () => {
+    setImage(null);
+    setuploadDisableBtn(false);
+    // setIm("");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
@@ -92,7 +145,7 @@ export default function UpdateBookmark() {
         <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
           Create New Bookmark
         </h2>
-        {link && isValidHttpUrl(link) && (
+        {((link && isValidHttpUrl(link)) || image !== null) && (
           <div className=" flex items-center justify-center">
             <img
               className="inline-block h-20 w-20 rounded-full ring-2 ring-white "
@@ -248,16 +301,38 @@ export default function UpdateBookmark() {
             </label>
             <input
               id="image"
-              name="image"
+              // name="image"
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="imageHanle w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
+
+            {image !== null && (
+              <>
+                <button
+                  type="button"
+                  className="ml-1 px-3 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+                  onClick={handleImageUpload}
+                >
+                  Upload It
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="ml-1 px-3 py-4 bg-red-500 text-white font-bold rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
+                >
+                  Remove
+                </button>
+              </>
+            )}
           </div>
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            disabled={uploadDisableBtn}
+            className={`${
+              uploadDisableBtn && "opacity-65"
+            } w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
           >
             Create Bookmark
           </button>

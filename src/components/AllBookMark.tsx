@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import _BookmarkCard from "./ui/BookmarkCard";
 import { useQuery } from "@tanstack/react-query";
 import { GrAddCircle } from "react-icons/gr";
@@ -30,17 +30,6 @@ function AllBookMark() {
   const profileData = useProfileData();
   const navigate = useNavigate();
   console.log(profileData);
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     const req = await fetch("http://localhost:3008/api/get-all-bookmark", {
-  //       credentials: "include",
-  //     });
-  //     const data = await req.json();
-  //     console.log(data);
-  //     setBookmark(data.data as IBookMark[]);
-  //   }
-  //   fetchData();
-  // }, []);
   const { data, refetch } = useQuery({
     queryKey: ["all-bookmark"],
     queryFn: async () => {
