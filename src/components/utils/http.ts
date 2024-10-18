@@ -222,6 +222,28 @@ export async function saveBookmarkOrder(reorderedData: IOrder[]) {
   console.log("Order saved successfully");
 }
 
+export async function generateTagAndDescription(post: string) {
+  const url = `${server}/ai/get-tags-summary-bart`;
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: post }),
+  });
+
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  return data;
+}
+
 export async function getBookmarkFromSearch(post: {
   [k: string]: FormDataEntryValue;
 }) {
