@@ -1,8 +1,8 @@
 import { useState } from "react";
 import _BookmarkCard from "./ui/BookmarkCard";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { GrAddCircle } from "react-icons/gr";
-import { getAllBookmark } from "./utils/http";
+import { getAllBookmark, queryclient, saveBookmarkOrder } from "./utils/http";
 import { useProfileData } from "./utils/useProfileData";
 import TopicsCard from "./ui/TopicsCard";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +34,7 @@ export interface IBookMark {
   createdAt?: Date;
   updatedAt?: Date;
   topics?: string;
+  position?: number;
   // _v: number;
 }
 export const Bookmark =
@@ -44,12 +45,23 @@ export const Bookmark =
 function AllBookMark() {
   const [bookmark, setBookmark] = useState<IBookMark[]>([]);
   const [activeItem, setActiveItem] = useState<IBookMark>();
+  const [orderState, setOrderstate] = useState(false);
   const profileData = useProfileData();
   const navigate = useNavigate();
   const { data, refetch } = useQuery({
     queryKey: ["all-bookmark"],
     queryFn: async () => {
       const data = await getAllBookmark();
+      data.sort(function (a: IBookMark, b: IBookMark) {
+        if (a.position !== undefined && b.position !== undefined) {
+          console.log(a.position);
+          console.log(b.position);
+          return a.position - b.position;
+        } else {
+          return;
+        }
+      });
+      console.log(data);
       setBookmark(data);
       return data;
     },
@@ -73,15 +85,35 @@ function AllBookMark() {
     if (!activeItem || !overItem) {
       return;
     }
-    const activeIndex = bookmark.findIndex((item) => item._id === active.id);
-    const overIndex = bookmark.findIndex((item) => item._id === over.id);
+    const activeIndex = bookmark.findIndex((item) => item._id === active.id); // old
+    const overIndex = bookmark.findIndex((item) => item._id === over.id); // new
     if (activeIndex !== overIndex) {
       console.log(bookmark);
-      setBookmark((prev) => arrayMove<IBookMark>(prev, activeIndex, overIndex));
+      const newItems = arrayMove(bookmark, activeIndex, overIndex);
+      console.log(newItems);
+      setBookmark(newItems);
+      setOrderstate(true);
       console.log(bookmark);
+      // saveOrder(newItems);
     }
     setActiveItem(undefined);
   }
+  const { mutate } = useMutation({
+    mutationFn: saveBookmarkOrder,
+    onSettled: () => {
+      queryclient.invalidateQueries({ queryKey: ["all-bookmark"] });
+    },
+  });
+  const saveOrder = async () => {
+    const reorderedData = bookmark.map((item, index) => ({
+      _id: item._id,
+      position: index, // Capture the new position for each item
+    }));
+    console.log(reorderedData);
+    mutate(reorderedData);
+    setOrderstate(false);
+  };
+
   const handleDragCancel = () => {
     setActiveItem(undefined);
   };
@@ -91,6 +123,15 @@ function AllBookMark() {
       <div className="ml-24">
         <SearchField setBookmark={setBookmark} />
       </div>
+      <button
+        onClick={saveOrder}
+        disabled={!orderState}
+        className={`${
+          !orderState && "opacity-45"
+        } mx-4 border-2 border-black my-3 px-10 py-2 rounded-3xl bg-blue-500 shadow-xl hover:bg-blue-400`}
+      >
+        Save Order
+      </button>
       <div className="flex flex-row w-full">
         <div className="min-w-0 max-w-96 flex flex-col min-h-screen  bg-blue-100 bg-opacity-35 ml-4 rounded-lg shadow-2xl transition-all duration-300">
           <div className="mx-2 px-2 my-2">
