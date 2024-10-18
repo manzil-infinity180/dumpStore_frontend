@@ -197,6 +197,30 @@ export async function getBookMarkByTopic(post: string) {
   console.log(data);
   return data;
 }
+interface IOrder {
+  _id: string;
+  position: number;
+}
+export async function saveBookmarkOrder(reorderedData: IOrder[]) {
+  const url = `${server}/api/save-order`;
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ updatedOrder: reorderedData }),
+  });
+
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  console.log("Order saved successfully");
+}
 
 export async function getBookmarkFromSearch(post: {
   [k: string]: FormDataEntryValue;
