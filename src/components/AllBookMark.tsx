@@ -9,6 +9,22 @@ import { useNavigate } from "react-router-dom";
 import Loader from "./utils/Loader";
 import SearchField from "./ui/SearchField";
 import Navbar from "./ui/Navbar";
+// dnd
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  KeyboardSensor,
+  TouchSensor,
+  PointerSensor,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+} from "@dnd-kit/sortable";
+import { useSensor, useSensors } from "@dnd-kit/core";
 export interface IBookMark {
   _id: string;
   title: string;
@@ -27,9 +43,9 @@ export const Bookmark =
 
 function AllBookMark() {
   const [bookmark, setBookmark] = useState<IBookMark[]>([]);
+  const [activeItem, setActiveItem] = useState<IBookMark>();
   const profileData = useProfileData();
   const navigate = useNavigate();
-  console.log(profileData);
   const { data, refetch } = useQuery({
     queryKey: ["all-bookmark"],
     queryFn: async () => {
@@ -39,6 +55,36 @@ function AllBookMark() {
     },
     refetchOnWindowFocus: false,
   });
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor),
+    useSensor(TouchSensor)
+  );
+  function handleDragStart(e: DragStartEvent) {
+    const { active } = e;
+    setActiveItem(bookmark.find((b) => b._id === active.id));
+  }
+  function handleDrag(e: DragEndEvent) {
+    const { active, over } = e;
+    if (over === null) return;
+    const activeItem = bookmark.find((item) => item._id === active.id);
+    const overItem = bookmark.find((item) => item._id === over.id);
+    console.log({ activeItem, overItem });
+    if (!activeItem || !overItem) {
+      return;
+    }
+    const activeIndex = bookmark.findIndex((item) => item._id === active.id);
+    const overIndex = bookmark.findIndex((item) => item._id === over.id);
+    if (activeIndex !== overIndex) {
+      console.log(bookmark);
+      setBookmark((prev) => arrayMove<IBookMark>(prev, activeIndex, overIndex));
+      console.log(bookmark);
+    }
+    setActiveItem(undefined);
+  }
+  const handleDragCancel = () => {
+    setActiveItem(undefined);
+  };
   return (
     <>
       <Navbar login={true} />
@@ -77,8 +123,26 @@ function AllBookMark() {
         </div>
         {data ? (
           <div className="mx-auto min-w-screen grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {bookmark &&
-              bookmark.map((el) => <Bookmark data={el} key={el._id} />)}
+            <DndContext
+              collisionDetection={closestCenter}
+              sensors={sensors}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDrag}
+              onDragCancel={handleDragCancel}
+            >
+              <SortableContext
+                items={bookmark.map((b) => ({ id: b._id }))}
+                strategy={rectSortingStrategy}
+              >
+                {bookmark &&
+                  bookmark.map((el) => <Bookmark data={el} key={el._id} />)}
+              </SortableContext>
+              {/* <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
+                {bookmark &&
+                  activeItem &&
+                  bookmark.map((el) => <Bookmark data={el} key={el._id} />)}
+              </DragOverlay> */}
+            </DndContext>
             {bookmark && (
               <div className="flex items-center justify-center border pt-4 pb-4 px-2 bg-slate-100 flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96">
                 <div className="flex justify-center items-center">
