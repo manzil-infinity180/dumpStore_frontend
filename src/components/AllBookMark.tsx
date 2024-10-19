@@ -46,6 +46,7 @@ function AllBookMark() {
   const [bookmark, setBookmark] = useState<IBookMark[]>([]);
   const [activeItem, setActiveItem] = useState<IBookMark>();
   const [orderState, setOrderstate] = useState(false);
+  const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
   const profileData = useProfileData();
   const navigate = useNavigate();
   const { data, refetch } = useQuery({
@@ -54,8 +55,6 @@ function AllBookMark() {
       const data = await getAllBookmark();
       data.sort(function (a: IBookMark, b: IBookMark) {
         if (a.position !== undefined && b.position !== undefined) {
-          console.log(a.position);
-          console.log(b.position);
           return a.position - b.position;
         } else {
           return;
@@ -100,6 +99,10 @@ function AllBookMark() {
   }
   const { mutate } = useMutation({
     mutationFn: saveBookmarkOrder,
+    onSuccess: (data) => {
+      console.log(data);
+      setuploadDisableBtn(false);
+    },
     onSettled: () => {
       queryclient.invalidateQueries({ queryKey: ["all-bookmark"] });
     },
@@ -112,6 +115,7 @@ function AllBookMark() {
     console.log(reorderedData);
     mutate(reorderedData);
     setOrderstate(false);
+    setuploadDisableBtn(true);
   };
 
   const handleDragCancel = () => {
@@ -163,7 +167,12 @@ function AllBookMark() {
             ))}
         </div>
         {data ? (
-          <div className="mx-auto min-w-screen grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            className={`${
+              uploadDisableBtn && "opacity-45"
+            }mx-auto min-w-screen grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3`}
+          >
+            {uploadDisableBtn && <Loader />}
             <DndContext
               collisionDetection={closestCenter}
               sensors={sensors}

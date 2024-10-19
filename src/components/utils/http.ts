@@ -219,11 +219,12 @@ export async function saveBookmarkOrder(reorderedData: IOrder[]) {
     );
     throw error;
   }
-  console.log("Order saved successfully");
+  const data = await res.json();
+  return data;
 }
 
 export async function generateTagAndDescription(post: string) {
-  const url = `${server}/ai/get-tags-summary-bart`;
+  const url = `${server}/ai/get-tags-summary-gemini`;
   const res = await fetch(url, {
     method: "POST",
     credentials: "include",

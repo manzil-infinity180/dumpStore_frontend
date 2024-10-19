@@ -28,9 +28,10 @@ function BookmarkCard({ data }: { data: IBookMark }) {
       {...attributes}
       className="touch-none border pt-4 pb-4 px-2 bg-slate-100 flex flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96"
     >
-      {/* <Link to={data.link} target="_blank"> */}
       <div className="flex justify-end">
-        <FiExternalLink className="text-xl" />
+        <Link to={data.link} target="_blank">
+          <FiExternalLink className="text-xl" />
+        </Link>
       </div>
       <div className=" flex items-center justify-center">
         <img
@@ -38,7 +39,7 @@ function BookmarkCard({ data }: { data: IBookMark }) {
           src={data.image}
         />
       </div>
-      {/* </Link> */}
+
       <div className="flex flex-col">
         {/* <Link to={data.link} target="_blank"> */}
         <h1 className="flex items-center justify-center mt-2">{data.title}</h1>
@@ -54,11 +55,10 @@ function BookmarkCard({ data }: { data: IBookMark }) {
               ))}
         </div>
       </div>
-      <div
-        className="flex justify-end items-end opacity-40"
-        onClick={() => navigate(`/edit/${data._id}`)}
-      >
-        <TbEdit className="text-xl mr-1" />
+      <div className="flex justify-end items-end opacity-40">
+        <Link to={`/edit/${data._id}`}>
+          <TbEdit className="text-xl mr-1" />
+        </Link>
         <p>{FindDate(data.createdAt as Date)}</p>
       </div>
     </div>

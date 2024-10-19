@@ -54,8 +54,12 @@ export default function UpdateBookmark() {
     mutationFn: generateTagAndDescription,
     onSuccess: (data) => {
       console.log(data);
-      setDescription(data.result[0].summary_text);
+      // setDescription(data.result[0].summary_text);
+      // setTags(data.tags);
+
+      setDescription(data.summary);
       setTags(data.tags);
+      setTitle(data.title);
       setuploadDisableBtn(false);
     },
     onError: (err) => {
