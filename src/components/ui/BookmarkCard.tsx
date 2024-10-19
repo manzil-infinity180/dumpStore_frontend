@@ -4,7 +4,14 @@ import { IBookMark } from "../AllBookMark";
 import { TbEdit } from "react-icons/tb";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-function BookmarkCard({ data }: { data: IBookMark }) {
+import TooltipDescription from "./TooltipDescription";
+function BookmarkCard({
+  data,
+  uploadDisableBtn,
+}: {
+  data: IBookMark;
+  uploadDisableBtn: boolean;
+}) {
   const navigate = useNavigate();
   const { setNodeRef, attributes, listeners, transform, transition } =
     useSortable({ id: data._id });
@@ -21,47 +28,57 @@ function BookmarkCard({ data }: { data: IBookMark }) {
     });
   }
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-      className="touch-none border pt-4 pb-4 px-2 bg-slate-100 flex flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96"
-    >
-      <div className="flex justify-end">
-        <Link to={data.link} target="_blank">
-          <FiExternalLink className="text-xl" />
-        </Link>
-      </div>
-      <div className=" flex items-center justify-center">
-        <img
-          className="inline-block h-16 w-16 rounded-full ring-2 ring-white "
-          src={data.image}
-        />
-      </div>
+    <>
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
+        className="touch-none border pt-4 pb-4 px-2 bg-slate-100 flex flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96"
+        data-tooltip-id={data._id}
+      >
+        <div className="flex justify-end">
+          <Link to={data.link} target="_blank">
+            <FiExternalLink className="text-xl" />
+          </Link>
+        </div>
+        <div className=" flex items-center justify-center">
+          <img
+            className="inline-block h-16 w-16 rounded-full ring-2 ring-white "
+            src={data.image}
+          />
+        </div>
 
-      <div className="flex flex-col">
-        {/* <Link to={data.link} target="_blank"> */}
-        <h1 className="flex items-center justify-center mt-2">{data.title}</h1>
-        {/* </Link> */}
-        <div>
-          {data.tag.includes(",") &&
-            data.tag
-              .split(",")
-              .map((x: string) => (
-                <button className="w-1/4 bg-white border border-slate-500 rounded-xl m-1">
-                  {x}
-                </button>
-              ))}
+        <div className="flex flex-col">
+          {/* <Link to={data.link} target="_blank"> */}
+          <h1 className="flex items-center justify-center mt-2">
+            {data.title}
+          </h1>
+          {/* </Link> */}
+          <div>
+            {data.tag.includes(",") &&
+              data.tag
+                .split(",")
+                .map((x: string) => (
+                  <button className="w-1/4 bg-white border border-slate-500 rounded-xl m-1">
+                    {x}
+                  </button>
+                ))}
+          </div>
+        </div>
+        <div className="flex justify-end items-end opacity-40">
+          <Link to={`/edit/${data._id}`}>
+            <TbEdit className="text-xl mr-1" />
+          </Link>
+          <p>{FindDate(data.createdAt as Date)}</p>
         </div>
       </div>
-      <div className="flex justify-end items-end opacity-40">
-        <Link to={`/edit/${data._id}`}>
-          <TbEdit className="text-xl mr-1" />
-        </Link>
-        <p>{FindDate(data.createdAt as Date)}</p>
-      </div>
-    </div>
+      <TooltipDescription
+        id={data._id}
+        place="bottom"
+        content={data.description && !uploadDisableBtn ? data.description : ""}
+      />
+    </>
   );
 }
 

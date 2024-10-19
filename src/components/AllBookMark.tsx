@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import _BookmarkCard from "./ui/BookmarkCard";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GrAddCircle } from "react-icons/gr";
@@ -25,6 +25,7 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import { useSensor, useSensors } from "@dnd-kit/core";
+import toast from "react-hot-toast";
 export interface IBookMark {
   _id: string;
   title: string;
@@ -35,11 +36,13 @@ export interface IBookMark {
   updatedAt?: Date;
   topics?: string;
   position?: number;
+  description?: string;
   // _v: number;
 }
 export const Bookmark =
   _BookmarkCard as unknown as React.JSXElementConstructor<{
     data: IBookMark;
+    uploadDisableBtn: boolean;
   }>;
 
 function AllBookMark() {
@@ -102,6 +105,7 @@ function AllBookMark() {
     onSuccess: (data) => {
       console.log(data);
       setuploadDisableBtn(false);
+      toast.success("Order Updated!");
     },
     onSettled: () => {
       queryclient.invalidateQueries({ queryKey: ["all-bookmark"] });
@@ -185,7 +189,13 @@ function AllBookMark() {
                 strategy={rectSortingStrategy}
               >
                 {bookmark &&
-                  bookmark.map((el) => <Bookmark data={el} key={el._id} />)}
+                  bookmark.map((el) => (
+                    <Bookmark
+                      data={el}
+                      key={el._id}
+                      uploadDisableBtn={uploadDisableBtn}
+                    />
+                  ))}
               </SortableContext>
               {/* <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
                 {bookmark &&
