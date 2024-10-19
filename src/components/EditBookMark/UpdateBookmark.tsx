@@ -13,6 +13,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { IBookMark } from "../AllBookMark";
 import { useProfileData } from "../utils/useProfileData";
+import toast from "react-hot-toast";
 
 export default function UpdateBookmark() {
   const [tags, setTags] = useState<string[]>([]);
@@ -103,6 +104,10 @@ export default function UpdateBookmark() {
         setCloudImage(imageUrl);
         setuploadDisableBtn(false);
       }
+      toast.success("Updated your bookmark");
+    },
+    onError: () => {
+      toast.error("Something went wrong");
     },
   });
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {

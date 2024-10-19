@@ -9,6 +9,7 @@ import SignUp from "./components/Auth/SignUp";
 import { queryclient } from "./components/utils/http";
 import { UserProfileData } from "./components/utils/useProfileData";
 import { useEffect } from "react";
+import { ToasterHelper } from "./components/ui/ToasterHelper";
 function App() {
   useEffect(() => {
     // check is application is logined or not if it is not then redirect to login page
@@ -55,6 +56,7 @@ function App() {
     <>
       <QueryClientProvider client={queryclient}>
         <RouterProvider router={router} />
+        <ToasterHelper />
       </QueryClientProvider>
     </>
   );
