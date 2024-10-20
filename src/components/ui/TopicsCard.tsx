@@ -5,20 +5,38 @@ import {
   getBookMarkByTopic,
   queryclient,
 } from "../utils/http";
-import { IBookMark } from "../AllBookMark";
+import { type IBookMark, type TtopicsOrder } from "../AllBookMark";
 import { MdDeleteForever } from "react-icons/md";
 interface ITopicsCard {
   topics: string;
   setBookmark: React.Dispatch<SetStateAction<IBookMark[]>>;
+  setManageTopicsOrder: React.Dispatch<SetStateAction<TtopicsOrder>>;
 }
-function TopicsCard({ topics, setBookmark }: ITopicsCard) {
+function TopicsCard({
+  topics,
+  setBookmark,
+  setManageTopicsOrder,
+}: ITopicsCard) {
   const { mutate } = useMutation({
     mutationFn: getBookMarkByTopic,
     onSuccess: () => {
       console.log("yeah");
     },
     onSettled: (data) => {
+      data.sort(function (a: IBookMark, b: IBookMark) {
+        if (
+          a.topics_position !== undefined &&
+          b.topics_position !== undefined
+        ) {
+          return a.topics_position - b.topics_position;
+        } else if (a.position !== undefined && b.position !== undefined) {
+          return a.position - b.position;
+        } else {
+          return;
+        }
+      });
       setBookmark(data);
+      setManageTopicsOrder("topics");
     },
   });
   const { mutate: deleteAllTopicsMutate } = useMutation({
@@ -57,7 +75,7 @@ function TopicsCard({ topics, setBookmark }: ITopicsCard) {
             className="mx-2 px-2 bg-slate-800 rounded-2xl my-2 cursor-pointer flex justify-start items-center"
             onClick={handleFunction}
           >
-            <h3 className="p-1 max-w-64 break-words text-white item">
+            <h3 className="p-1 max-w-48 break-words text-white item">
               {topics}
             </h3>
 

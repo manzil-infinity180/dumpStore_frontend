@@ -36,7 +36,9 @@ export interface IBookMark {
   updatedAt?: Date;
   topics?: string;
   position?: number;
+  topics_position?: number;
   description?: string;
+
   // _v: number;
 }
 export const Bookmark =
@@ -44,12 +46,15 @@ export const Bookmark =
     data: IBookMark;
     uploadDisableBtn: boolean;
   }>;
+export type TtopicsOrder = "all" | "topics";
 
 function AllBookMark() {
   const [bookmark, setBookmark] = useState<IBookMark[]>([]);
   const [activeItem, setActiveItem] = useState<IBookMark>();
   const [orderState, setOrderstate] = useState(false);
   const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
+  const [manageTopicsOrder, setManageTopicsOrder] =
+    useState<TtopicsOrder>("all");
   const profileData = useProfileData();
   const navigate = useNavigate();
   const { data, refetch } = useQuery({
@@ -112,9 +117,10 @@ function AllBookMark() {
     },
   });
   const saveOrder = async () => {
+    const value = manageTopicsOrder === "all" ? "position" : "topics_position";
     const reorderedData = bookmark.map((item, index) => ({
       _id: item._id,
-      position: index, // Capture the new position for each item
+      [value]: index, // Capture the new position for each item
     }));
     console.log(reorderedData);
     mutate(reorderedData);
@@ -160,14 +166,21 @@ function AllBookMark() {
           </div>
           <div
             className="mx-2 px-2 bg-red-600 rounded-2xl my-2 cursor-pointer bg-opacity-75"
-            onClick={() => refetch()}
+            onClick={() => {
+              setManageTopicsOrder("all");
+              refetch();
+            }}
           >
             <h3 className="p-1 max-w-64 break-words text-white ">Reset</h3>
           </div>
           {profileData &&
             profileData.topics &&
             profileData.topics.map((el) => (
-              <TopicsCard topics={el} setBookmark={setBookmark} />
+              <TopicsCard
+                topics={el}
+                setBookmark={setBookmark}
+                setManageTopicsOrder={setManageTopicsOrder}
+              />
             ))}
         </div>
         {data ? (
@@ -197,11 +210,6 @@ function AllBookMark() {
                     />
                   ))}
               </SortableContext>
-              {/* <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
-                {bookmark &&
-                  activeItem &&
-                  bookmark.map((el) => <Bookmark data={el} key={el._id} />)}
-              </DragOverlay> */}
             </DndContext>
             {bookmark && (
               <div className="flex items-center justify-center border pt-4 pb-4 px-2 bg-slate-100 flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96">

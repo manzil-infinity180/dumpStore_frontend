@@ -199,7 +199,7 @@ export async function getBookMarkByTopic(post: string) {
 }
 interface IOrder {
   _id: string;
-  position: number;
+  [x: string]: string | number;
 }
 export async function saveBookmarkOrder(reorderedData: IOrder[]) {
   const url = `${server}/api/save-order`;
