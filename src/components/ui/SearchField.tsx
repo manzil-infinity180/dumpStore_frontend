@@ -15,8 +15,13 @@ function SearchField({ setBookmark }: ISearchField) {
     },
     onSettled: (data) => {
       console.log("settled");
+      if (data.length === 0) {
+        toast.success("No data available");
+        setSearchField("");
+        return;
+      }
       setBookmark(data);
-      toast.success(`data.length data fetched`);
+      toast.success(`${data.length} data received`);
       setSearchField("");
     },
     onError: () => {

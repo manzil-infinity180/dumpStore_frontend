@@ -8,7 +8,6 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useProfileData } from "../utils/useProfileData";
 import { useNavigate } from "react-router-dom";
-import { IoMdAdd } from "react-icons/io";
 import Loader from "../utils/Loader";
 import toast from "react-hot-toast";
 

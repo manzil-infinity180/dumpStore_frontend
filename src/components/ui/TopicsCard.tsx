@@ -1,17 +1,20 @@
-import { useMutation } from "@tanstack/react-query";
 import React, { SetStateAction } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { MdDeleteForever } from "react-icons/md";
+import { FaTag } from "react-icons/fa";
 import {
   deleteAllBookmarkByTopics,
   getBookMarkByTopic,
   queryclient,
 } from "../utils/http";
 import { type IBookMark, type TtopicsOrder } from "../AllBookMark";
-import { MdDeleteForever } from "react-icons/md";
+
 interface ITopicsCard {
   topics: string;
   setBookmark: React.Dispatch<SetStateAction<IBookMark[]>>;
   setManageTopicsOrder: React.Dispatch<SetStateAction<TtopicsOrder>>;
 }
+
 function TopicsCard({
   topics,
   setBookmark,
@@ -20,10 +23,10 @@ function TopicsCard({
   const { mutate } = useMutation({
     mutationFn: getBookMarkByTopic,
     onSuccess: () => {
-      console.log("yeah");
+      console.log("Bookmarks fetched successfully");
     },
     onSettled: (data) => {
-      data.sort(function (a: IBookMark, b: IBookMark) {
+      data.sort((a: IBookMark, b: IBookMark) => {
         if (
           a.topics_position !== undefined &&
           b.topics_position !== undefined
@@ -32,60 +35,59 @@ function TopicsCard({
         } else if (a.position !== undefined && b.position !== undefined) {
           return a.position - b.position;
         } else {
-          return;
+          return 0;
         }
       });
       setBookmark(data);
       setManageTopicsOrder("topics");
     },
   });
+
   const { mutate: deleteAllTopicsMutate } = useMutation({
     mutationFn: deleteAllBookmarkByTopics,
     onSuccess: () => {
-      console.log("yeah");
+      console.log("Topic and related bookmarks deleted successfully");
     },
     onSettled: () => {
       queryclient.invalidateQueries();
     },
   });
-  //   console.log(data);
+
   function handleFunction(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.closest(".delete-btn")) {
       e.stopPropagation();
-      // handle delete event
       const value = confirm(
-        "Are you really want to delete topic and all the bookmark of that topic?"
+        "Are you really want to delete this whole bookmark?"
       );
-      console.log(value);
       if (value) {
         deleteAllTopicsMutate(topics);
       }
       return;
     }
-    console.log(e.currentTarget);
-    console.log(topics);
     mutate(topics);
   }
+
   return (
     <>
       {topics && (
-        <>
-          <div
-            className="mx-2 px-2 bg-slate-800 rounded-2xl my-2 cursor-pointer flex justify-start items-center"
-            onClick={handleFunction}
-          >
-            <h3 className="p-1 max-w-48 break-words text-white item">
-              {topics}
-            </h3>
-
-            <MdDeleteForever
-              size={25}
-              className="mx-3 opacity-60 delete-btn"
-              style={{ color: "red" }}
-            />
+        <div
+          className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer mb-2 overflow-y-auto"
+          onClick={handleFunction}
+        >
+          <div className="flex items-center justify-between p-3">
+            <div className="flex items-center space-x-2 flex-grow">
+              <FaTag className="text-blue-500" />
+              <h3 className="text-gray-800">{topics}</h3>
+            </div>
+            <button
+              className="delete-btn text-red-500 hover:text-red-700 transition-colors duration-300 p-1 rounded-full hover:bg-red-100"
+              // onClick={(e) => e.stopPropagation()}
+            >
+              <MdDeleteForever size={25} className="delete-btn" />
+            </button>
           </div>
-        </>
+        </div>
       )}
     </>
   );

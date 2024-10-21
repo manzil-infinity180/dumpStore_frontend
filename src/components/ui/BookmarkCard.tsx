@@ -1,10 +1,20 @@
 import { FiExternalLink } from "react-icons/fi";
-import { Link, useNavigate } from "react-router-dom";
-import { IBookMark } from "../AllBookMark";
+import { Link } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import TooltipDescription from "./TooltipDescription";
+
+interface IBookMark {
+  _id: string;
+  link: string;
+  image: string;
+  title: string;
+  tag: string;
+  createdAt: Date;
+  description?: string;
+}
+
 function BookmarkCard({
   data,
   uploadDisableBtn,
@@ -12,13 +22,13 @@ function BookmarkCard({
   data: IBookMark;
   uploadDisableBtn: boolean;
 }) {
-  const navigate = useNavigate();
   const { setNodeRef, attributes, listeners, transform, transition } =
     useSortable({ id: data._id });
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
   };
+
   function FindDate(date: Date) {
     const d1 = new Date(date);
     return d1.toLocaleString("en-US", {
@@ -27,6 +37,7 @@ function BookmarkCard({
       day: "numeric",
     });
   }
+
   return (
     <>
       <div
@@ -34,50 +45,58 @@ function BookmarkCard({
         style={style}
         {...listeners}
         {...attributes}
-        className="touch-none border pt-4 pb-4 px-2 bg-slate-100 flex flex-col  rounded-xl cursor-pointer max-h-72 min-w-64 max-w-96"
+        className="touch-none border bg-white shadow-md rounded-xl cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg max-w-sm w-full mx-auto"
         data-tooltip-id={data._id}
       >
-        <div className="flex justify-end">
-          <Link to={data.link} target="_blank">
-            <FiExternalLink className="text-xl" />
-          </Link>
-        </div>
-        <div className=" flex items-center justify-center">
-          <img
-            className="inline-block h-16 w-16 rounded-full ring-2 ring-white "
-            src={data.image}
-          />
-        </div>
+        <div className="p-4 flex flex-col h-full">
+          <div className="flex justify-between items-center mb-4">
+            <img
+              className="h-16 w-16 rounded-full ring-2 ring-gray-200 object-cover"
+              src={data.image}
+              alt={data.title}
+            />
+            <Link
+              to={data.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-600 transition-colors"
+            >
+              <FiExternalLink className="text-xl" />
+            </Link>
+          </div>
 
-        <div className="flex flex-col">
-          {/* <Link to={data.link} target="_blank"> */}
-          <h1 className="flex items-center justify-center mt-2">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
             {data.title}
-          </h1>
-          {/* </Link> */}
-          <div>
-            {data.tag.includes(",") &&
-              data.tag
-                .split(",")
-                .map((x: string) => (
-                  <button className="w-1/4 bg-white border border-slate-500 rounded-xl m-1">
-                    {x}
-                  </button>
-                ))}
+          </h2>
+
+          <div className="flex flex-wrap gap-2 mb-4">
+            {data.tag.split(",").map((tag, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
+              >
+                {tag.trim()}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-auto flex justify-between items-center text-sm text-gray-500">
+            <Link
+              to={`/edit/${data._id}`}
+              className="flex items-center hover:text-blue-500 transition-colors"
+            >
+              <TbEdit className="text-xl mr-1" />
+              <span>Edit</span>
+            </Link>
+            <p>{FindDate(data.createdAt)}</p>
           </div>
         </div>
-        <div className="flex justify-end items-end opacity-40">
-          <Link to={`/edit/${data._id}`}>
-            <TbEdit className="text-xl mr-1" />
-          </Link>
-          <p>{FindDate(data.createdAt as Date)}</p>
-        </div>
       </div>
-      <TooltipDescription
+      {/* <TooltipDescription
         id={data._id}
         place="bottom"
         content={data.description && !uploadDisableBtn ? data.description : ""}
-      />
+      /> */}
     </>
   );
 }
