@@ -37,7 +37,7 @@ export default function Payment() {
   const loader = "auto";
 
   return (
-    <div className="App">
+    <div className="Payment_style">
       {clientSecret && (
         <Elements
           options={{ clientSecret, loader, appearance }}
