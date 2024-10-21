@@ -57,9 +57,13 @@ export default function CheckoutForm({
 
   return (
     <>
-      <form id="payment-form" onSubmit={handleSubmit}>
+      <form id="payment-form" onSubmit={handleSubmit} className="form_style">
         <PaymentElement id="payment-element" options={paymentElementOptions} />
-        <button disabled={isLoading || !stripe || !elements} id="submit">
+        <button
+          disabled={isLoading || !stripe || !elements}
+          id="submit"
+          className="pay-btn"
+        >
           <span id="button-text">
             {isLoading ? (
               <div className="spinner" id="spinner"></div>
@@ -81,6 +85,7 @@ export default function CheckoutForm({
             target="_blank"
             rel="noopener noreferrer"
             id="dpm-integration-checker"
+            className="a_style"
           >
             Preview payment methods by transaction
           </a>

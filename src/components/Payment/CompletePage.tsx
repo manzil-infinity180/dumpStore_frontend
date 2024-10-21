@@ -63,7 +63,9 @@ export default function CompletePage() {
       >
         {STATUS_CONTENT_MAP[status].icon}
       </div>
-      <h2 id="status-text">{STATUS_CONTENT_MAP[status].text}</h2>
+      <h2 id="status-text" className="h2_style">
+        {STATUS_CONTENT_MAP[status].text}
+      </h2>
       {intentId && (
         <div id="details-table">
           <table>
@@ -86,6 +88,7 @@ export default function CompletePage() {
       )}
       {intentId && (
         <a
+          className="a_style"
           href={`https://dashboard.stripe.com/payments/${intentId}`}
           id="view-details"
           rel="noopener noreferrer"
