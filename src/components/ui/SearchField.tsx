@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import React, { SetStateAction, useState } from "react";
 import { getBookmarkFromSearch } from "../utils/http";
 import { IBookMark } from "../AllBookMark";
+import toast from "react-hot-toast";
 interface ISearchField {
   setBookmark: React.Dispatch<SetStateAction<IBookMark[]>>;
 }
@@ -14,8 +15,17 @@ function SearchField({ setBookmark }: ISearchField) {
     },
     onSettled: (data) => {
       console.log("settled");
+      if (data.length === 0) {
+        toast.success("No data available");
+        setSearchField("");
+        return;
+      }
       setBookmark(data);
+      toast.success(`${data.length} data received`);
       setSearchField("");
+    },
+    onError: () => {
+      toast.error("Something went wrong with the search field");
     },
   });
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

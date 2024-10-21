@@ -8,19 +8,24 @@ import {
   getBookMark,
   queryclient,
   updateBookmark,
+  uploadImageToCloud,
 } from "../utils/http";
 import { useNavigate, useParams } from "react-router-dom";
 import { IBookMark } from "../AllBookMark";
 import { useProfileData } from "../utils/useProfileData";
+import toast from "react-hot-toast";
 
 export default function UpdateBookmark() {
   const [tags, setTags] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imageURL, setImageURL] = useState("");
+  const [cloudImage, setCloudImage] = useState<string>("");
   const [selectedTopics, setSelectedTopics] = useState("");
   const [customTopics, setCustomTopics] = useState("");
   const [topics, setTopics] = useState(["All"]);
+  const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
+  const [checked, setChecked] = useState(false);
   const { bookmarkID } = useParams();
   const navigate = useNavigate();
   const [value, setValue] = useState<IBookMark>({
@@ -66,11 +71,17 @@ export default function UpdateBookmark() {
     // Handle form submission here
     const formdata = new FormData(e.currentTarget);
     formdata.append("id", bookmarkID as string);
+    if (cloudImage.length) {
+      formdata.set("image", cloudImage);
+    } else {
+      formdata.append("image", data.image);
+    }
     const filteredData = Object.fromEntries(formdata.entries());
     Object.keys(filteredData).forEach(
       (key) => filteredData[key] === "" && delete filteredData[key]
     );
-    console.log(formdata);
+    console.log(filteredData);
+    console.log(data.image.includes("cloudinary"));
     mutate(filteredData);
   };
   async function handleDeleteBookMark() {
@@ -84,6 +95,21 @@ export default function UpdateBookmark() {
       [e.target.name]: e.currentTarget.value,
     });
   };
+  const { mutate: UploadImageMutate } = useMutation({
+    mutationFn: uploadImageToCloud,
+    onSuccess: (uploadImageUrl) => {
+      console.log("Yeah bro upload it!!!!!!!!");
+      const { imageUrl } = uploadImageUrl;
+      if (imageUrl.length) {
+        setCloudImage(imageUrl);
+        setuploadDisableBtn(false);
+      }
+      toast.success("Updated your bookmark");
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -94,6 +120,7 @@ export default function UpdateBookmark() {
   const handleRemoveImage = () => {
     setImage(null);
     setImageURL("");
+    setCloudImage("");
   };
   const handleTopicsChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedTopics(e.target.value);
@@ -124,7 +151,22 @@ export default function UpdateBookmark() {
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
-
+  const handleImageUpload = () => {
+    console.log(image);
+    if (image !== null) {
+      const formdata = new FormData();
+      console.log(image);
+      formdata.append("photo", image);
+      console.log(formdata.getAll("photo"));
+      console.log(formdata);
+      const category = Object.fromEntries(formdata);
+      if (!category) {
+        throw new Error("Something went work");
+      }
+      setuploadDisableBtn(true);
+      UploadImageMutate(formdata);
+    }
+  };
   return (
     <>
       {data && (
@@ -283,18 +325,49 @@ export default function UpdateBookmark() {
                   } px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100`}
                 />
                 {imageURL && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveImage}
-                    className="ml-1 px-3 py-4 bg-red-500 text-white font-bold rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
-                  >
-                    Remove
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="ml-1 px-3 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+                      onClick={handleImageUpload}
+                    >
+                      Upload It
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="ml-1 px-3 py-4 bg-red-500 text-white font-bold rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
+                    >
+                      Remove
+                    </button>
+                  </>
                 )}
               </div>
+
+              {!(cloudImage || imageURL) &&
+                data.image.includes("cloudinary") && (
+                  <>
+                    <input
+                      type="checkbox"
+                      id="vehicle1"
+                      name="isChecked"
+                      value={checked ? "yes" : "no"}
+                      checked={checked}
+                      onChange={() => setChecked((s) => !s)}
+                    />
+                    <label className="font-semibold">
+                      &#32; Remove Custom Upload Image and use default Favicon
+                      :&#40;
+                    </label>
+                  </>
+                )}
+              <br></br>
               <button
                 type="submit"
-                className="flex text-center justify-center w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                disabled={uploadDisableBtn}
+                className={`
+                  ${uploadDisableBtn && "opacity-65"}
+                  flex text-center justify-center w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
               >
                 <GrUpdate size={20} className="mx-3" />
                 <span>Update Bookmark</span>

@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoArrowUpRight } from "react-icons/go";
 import { FaGithubAlt } from "react-icons/fa6";
 import { logout } from "../utils/http";
 import { useQuery } from "@tanstack/react-query";
+
 interface INavbar {
   login: boolean;
 }
-function Navbar({ login = false }: INavbar) {
+
+export default function Navbar({ login = false }: INavbar) {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const { refetch } = useQuery({
     queryKey: ["getme"],
     queryFn: async () => {
@@ -15,14 +20,16 @@ function Navbar({ login = false }: INavbar) {
     },
     enabled: false,
   });
+
   function handleLogout() {
     refetch();
   }
+
   return (
-    <nav className="border-gray-300 bg-white mx-6 md:mx-10 mt-4 mb-16 shadow-2xl rounded-xl transition-all duration-300">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
+    <nav className="border-gray-300 bg-white mx-auto mt-4 mb-16 shadow-2xl rounded-xl transition-all duration-300 max-w-7xl">
+      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <Link
-          to={"/"}
+          to="/"
           className="flex items-center space-x-3 rtl:space-x-reverse transform hover:scale-105 transition duration-300"
         >
           <svg
@@ -125,81 +132,78 @@ function Navbar({ login = false }: INavbar) {
           type="button"
           className="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg md:hidden hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200"
           aria-controls="navbar-default"
-          aria-expanded="false"
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <span className="sr-only">Open main menu</span>
           <svg
-            className="w-6 h-6"
+            className="w-5 h-5"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+            viewBox="0 0 17 14"
           >
             <path
+              stroke="currentColor"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
+              d="M1 1h15M1 7h15M1 13h15"
             />
           </svg>
         </button>
-        <div className="hidden w-full md:block md:w-auto" id="navbar-default">
-          <ul className="font-medium flex flex-col md:flex-row p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:mt-0 md:border-0">
+        <div
+          className={`${
+            isMenuOpen ? "block" : "hidden"
+          } w-full md:block md:w-auto`}
+          id="navbar-default"
+        >
+          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white">
             <li>
-              <a
-                href="/"
-                className="block py-2 px-4 text-gray-900 rounded hover:text-blue-600 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
-                aria-current="page"
+              <Link
+                to="/"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
               >
                 Home
-              </a>
+              </Link>
             </li>
-            {/* <li>
-              <a
-                href="#"
-                className="block py-2 px-4 text-gray-900 rounded hover:text-blue-600 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
-              >
-                About
-              </a>
-            </li> */}
             <li>
               <a
                 href="https://github.com/manzil-infinity180/dumpStore_backend"
-                className="flex py-2 px-4 text-gray-900 rounded hover:text-blue-600 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
+                className="flex items-center py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
               >
-                <FaGithubAlt className="text-2xl mx-1 opacity-80" />
+                <FaGithubAlt className="text-2xl mr-1 opacity-80" />
                 <span>Github</span>
               </a>
             </li>
             <li>
-              <a
-                href="/create"
-                className="block py-2 px-4 text-gray-900 rounded hover:text-blue-600 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
+              <Link
+                to="/create"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
               >
                 Create New?
-              </a>
+              </Link>
             </li>
             {!login && (
               <li>
-                <a
-                  href="/login"
-                  className=" flex py-10 px-4 text-red-900 rounded hover:text-blue-600 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
+                <Link
+                  to="/login"
+                  className="flex items-center py-2 px-3 text-red-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 transition-all duration-200"
                 >
                   <span>Login</span>
-                  <GoArrowUpRight className="text-xl" />
-                </a>
+                  <GoArrowUpRight className="text-xl ml-1" />
+                </Link>
               </li>
             )}
             {login && (
               <li>
-                <a
-                  className="cursor-pointer flex py-10 px-4 text-gray-900 rounded hover:text-red-600 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 transition-all duration-200"
+                <button
                   onClick={handleLogout}
+                  className="flex items-center w-full text-left py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 transition-all duration-200"
                 >
                   <span>Logout</span>
-                  <GoArrowUpRight className="text-xl" />
-                </a>
+                  <GoArrowUpRight className="text-xl ml-1" />
+                </button>
               </li>
             )}
           </ul>
@@ -208,5 +212,3 @@ function Navbar({ login = false }: INavbar) {
     </nav>
   );
 }
-
-export default Navbar;
