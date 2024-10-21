@@ -1,5 +1,4 @@
 import { QueryClient } from "@tanstack/react-query";
-import React from "react";
 import { NavigateFunction } from "react-router-dom";
 export const queryclient = new QueryClient();
 const server = "http://localhost:3008";
@@ -46,16 +45,11 @@ export async function createBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
   console.log(post);
-  const post1 = {
-    title: post.title,
-    link: post.link,
-    tag: post.tag,
-  };
   const url = `${server}/api/create-bookmark`;
   // console.log(JSON.stringify(post));
   const res = await fetch(url, {
     method: "POST",
-    body: JSON.stringify(post1),
+    body: JSON.stringify(post),
     credentials: "include",
     headers: {
       "Content-type": "application/json",
@@ -81,7 +75,6 @@ export async function updateBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
   console.log(post);
-
   const url = `${server}/api/update-bookmark`;
   // console.log(JSON.stringify(post));
   const res = await fetch(url, {
@@ -204,6 +197,53 @@ export async function getBookMarkByTopic(post: string) {
   console.log(data);
   return data;
 }
+interface IOrder {
+  _id: string;
+  [x: string]: string | number;
+}
+export async function saveBookmarkOrder(reorderedData: IOrder[]) {
+  const url = `${server}/api/save-order`;
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ updatedOrder: reorderedData }),
+  });
+
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const data = await res.json();
+  return data;
+}
+
+export async function generateTagAndDescription(post: string) {
+  const url = `${server}/ai/get-tags-summary-gemini`;
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: post }),
+  });
+
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  return data;
+}
 
 export async function getBookmarkFromSearch(post: {
   [k: string]: FormDataEntryValue;
@@ -276,6 +316,56 @@ export async function deleteBookmark(bookmarkID: string) {
     throw error;
   }
   const data = await res.json();
+  console.log(data);
+  return data;
+}
+export async function deleteAllBookmarkByTopics(topics: string) {
+  const url = `${server}/api/delete-bookmark-by-topics`;
+  // console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "DELETE",
+    body: JSON.stringify({ topics }),
+    credentials: "include",
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const data = await res.json();
+  console.log(data);
+  return data;
+}
+
+export async function uploadImageToCloud(post: FormData) {
+  console.log(post);
+  console.log([...post.entries()]);
+  const url = `${server}/api/upload-image-to-cloud`;
+  // console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "POST",
+    body: post,
+    credentials: "include",
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
   console.log(data);
   return data;
 }

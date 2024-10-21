@@ -11,6 +11,7 @@ import { UserProfileData } from "./components/utils/useProfileData";
 import { useEffect, useState } from "react";
 import Payment from "./components/Payment/Payment";
 import CompletePage from "./components/Payment/CompletePage";
+import { ToasterHelper } from "./components/ui/ToasterHelper";
 function App() {
   const [clientSecret, setClientSecret] = useState("");
   const [dpmCheckerLink, setDpmCheckerLink] = useState("");
@@ -85,6 +86,7 @@ function App() {
     <>
       <QueryClientProvider client={queryclient}>
         <RouterProvider router={router} />
+        <ToasterHelper />
       </QueryClientProvider>
     </>
   );
