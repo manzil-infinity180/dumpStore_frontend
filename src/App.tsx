@@ -8,12 +8,34 @@ import CreateBookmark from "./components/EditBookMark/CreateBookmark";
 import SignUp from "./components/Auth/SignUp";
 import { queryclient } from "./components/utils/http";
 import { UserProfileData } from "./components/utils/useProfileData";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Payment from "./components/Payment/Payment";
+import CompletePage from "./components/Payment/CompletePage";
 import { ToasterHelper } from "./components/ui/ToasterHelper";
 function App() {
+  const [clientSecret, setClientSecret] = useState("");
+  const [dpmCheckerLink, setDpmCheckerLink] = useState("");
+
   useEffect(() => {
-    // check is application is logined or not if it is not then redirect to login page
-  });
+    // Create PaymentIntent as soon as the page loads
+    fetch("http://localhost:3008/payment/create-payment-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 1000 }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setClientSecret(data.clientSecret);
+        // [DEV] For demo purposes only
+        setDpmCheckerLink(data.dpmCheckerLink);
+      });
+  }, []);
+
+  const appearance = {
+    theme: "stripe" as const,
+  };
+  // Enable the skeleton loader UI for optimal loading.
+  const loader = "auto";
   const router = createBrowserRouter([
     {
       path: "*",
@@ -46,6 +68,14 @@ function App() {
           <UpdateBookmark />
         </UserProfileData>
       ),
+    },
+    {
+      path: "/payment",
+      element: <Payment />,
+    },
+    {
+      path: "/complete",
+      element: <CompletePage />,
     },
     // {
     //   path: "/topics",
