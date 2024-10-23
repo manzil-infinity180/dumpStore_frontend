@@ -10,6 +10,7 @@ import { queryclient } from "./components/utils/http";
 import { UserProfileData } from "./components/utils/useProfileData";
 import { useEffect } from "react";
 import { ToasterHelper } from "./components/ui/ToasterHelper";
+import UploadBookmarFile from "./components/ui/UploadBookmarkFile";
 function App() {
   useEffect(() => {
     // check is application is logined or not if it is not then redirect to login page
@@ -46,6 +47,10 @@ function App() {
           <UpdateBookmark />
         </UserProfileData>
       ),
+    },
+    {
+      path: "/upload/bookmark",
+      element: <UploadBookmarFile />,
     },
     // {
     //   path: "/topics",
