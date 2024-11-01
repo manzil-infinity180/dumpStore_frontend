@@ -1,5 +1,6 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import {
+  addRemainder,
   createBookmark,
   generateTagAndDescription,
   queryclient,
@@ -23,6 +24,8 @@ export default function UpdateBookmark() {
   const [customTopics, setCustomTopics] = useState("");
   const [topics, setTopics] = useState<string[]>([]);
   const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
+  const [endDate, setEndDate] = useState<string>("");
+  const [check, setCheck] = useState(true);
   const navigate = useNavigate();
   const profileData = useProfileData();
   useEffect(() => {
@@ -172,6 +175,43 @@ export default function UpdateBookmark() {
     setImage(null);
     setuploadDisableBtn(false);
     // setIm("");
+  };
+  const {mutate: calendarRemainderMutate} = useMutation({
+    mutationFn: addRemainder,
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Added to Calendar")
+      setCheck(false);
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error("Redirect for authorization");
+    }
+  })
+  const handleRemainder = async () => {
+    if (!title || !link) {
+      throw new Error("Value object is missing title or link");
+    }
+    if (!endDate) {
+      throw new Error("End date is undefined");
+    }
+  
+    const dateStart = new Date().toISOString();
+    const dateEnd = new Date(endDate).toISOString();
+  
+    if (dateStart > dateEnd) {
+      throw new Error("End date should be greater than start date");
+    }
+
+    const post = {
+      summary: title,
+      link: link,
+      endDate: dateEnd,
+      startDate: dateStart
+    };
+  
+    console.log("Post object:", JSON.stringify(post));
+    calendarRemainderMutate(post)
   };
 
   return (
@@ -347,6 +387,27 @@ export default function UpdateBookmark() {
               rows={4}
             />
           </div>
+           {(title && link && check ) && <div className="space-y-2">
+                <label
+                  htmlFor="date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Add Date to Calendar
+                </label>
+                <input
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.currentTarget.value)}
+                  type="date"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+               {endDate &&  <button
+                      type="button"
+                      className="ml-1 px-3 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+                      onClick={handleRemainder}
+                    >
+                      Add Remainder
+                    </button>}
+            </div>}
           <div className="space-y-2">
             <label
               htmlFor="image"
