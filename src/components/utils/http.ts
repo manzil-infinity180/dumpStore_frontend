@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { NavigateFunction } from "react-router-dom";
+import { IRemaindar } from "../EditBookMark/UpdateBookmark";
 export const queryclient = new QueryClient();
 const server = "http://localhost:3008";
 class APIError extends Error {
@@ -358,6 +359,32 @@ export async function uploadImageToCloud(post: FormData) {
   // console.log(res);
   if (!res.ok) {
     const info = await res.json();
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  console.log(data);
+  return data;
+}
+
+export async function addRemainder(post :  IRemaindar) {
+  const url = `${server}/api/calendar`;
+  console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(post),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    console.log(info);
+    window.open(`http://localhost:3008/auth/google`, "_self")
     const error = new APIError(
       "An error occurred while fetching the events",
       res.status,

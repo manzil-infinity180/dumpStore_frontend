@@ -4,6 +4,7 @@ import { GrUpdate } from "react-icons/gr";
 import { MdDeleteForever } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import {
+  addRemainder,
   deleteBookmark,
   getBookMark,
   queryclient,
@@ -14,7 +15,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { IBookMark } from "../AllBookMark";
 import { useProfileData } from "../utils/useProfileData";
 import toast from "react-hot-toast";
-
+export interface IRemaindar {
+  summary : string;
+  link: string
+  endDate: string
+  startDate : string
+}
 export default function UpdateBookmark() {
   const [tags, setTags] = useState<string[]>([]);
   const [description, setDescription] = useState("");
@@ -26,6 +32,7 @@ export default function UpdateBookmark() {
   const [topics, setTopics] = useState(["All"]);
   const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [endDate, setEndDate] = useState<string>("");
   const { bookmarkID } = useParams();
   const navigate = useNavigate();
   const [value, setValue] = useState<IBookMark>({
@@ -167,6 +174,41 @@ export default function UpdateBookmark() {
       UploadImageMutate(formdata);
     }
   };
+
+  const {mutate: calendarRemainderMutate} = useMutation({
+    mutationFn: addRemainder,
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.log(error);
+    }
+  })
+  const handleRemainder = async () => {
+    if (!value || !value.title || !value.link) {
+      throw new Error("Value object is missing title or link");
+    }
+    if (!endDate) {
+      throw new Error("End date is undefined");
+    }
+  
+    const dateStart = new Date().toISOString();
+    const dateEnd = new Date(endDate).toISOString();
+  
+    if (dateStart > dateEnd) {
+      throw new Error("End date should be greater than start date");
+    }
+  
+    const post = {
+      summary: value.title,
+      link: value.link,
+      endDate: dateEnd,
+      startDate: dateStart
+    };
+  
+    console.log("Post object:", JSON.stringify(post));
+    calendarRemainderMutate(post)
+  };
   return (
     <>
       {data && (
@@ -288,6 +330,27 @@ export default function UpdateBookmark() {
                 >
                   <IoMdAdd className="text-lg" />
                 </button>
+              </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Add Date to Calendar
+                </label>
+                <input
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.currentTarget.value)}
+                  type="date"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                />
+               {endDate &&  <button
+                      type="button"
+                      className="ml-1 px-3 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+                      onClick={handleRemainder}
+                    >
+                      Add Remainder
+                    </button>}
               </div>
               <div className="space-y-2">
                 <label
