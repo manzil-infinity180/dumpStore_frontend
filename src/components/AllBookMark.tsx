@@ -138,10 +138,17 @@ function AllBookMark() {
             <h3 className="text-lg font-bold mb-4 text-center">TOPICS</h3>
             <button
               onClick={() => navigate("/create")}
-              className="w-full bg-blue-500 text-white rounded-md py-2 px-4 mb-4 flex items-center justify-center hover:bg-blue-600 transition duration-300"
+              className="w-full bg-blue-500 text-white rounded-md py-2 px-4 mb-4 flex items-center justify-start hover:bg-blue-600 transition duration-300"
             >
               <GrAddCircle className="mr-2" />
               Add New Bookmark
+            </button>
+            <button
+              onClick={() => navigate("/upload/bookmark")}
+              className="w-full bg-green-500 text-white rounded-md py-2 px-4 mb-4 flex items-center justify-start hover:bg-green-600 transition duration-300"
+            >
+              <GrAddCircle className="mr-2" />
+              Import Bookmark Data
             </button>
             <button
               onClick={() => {
