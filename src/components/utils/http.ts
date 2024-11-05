@@ -396,3 +396,24 @@ export async function addRemainder(post :  IRemaindar) {
   console.log(data);
   return data;
 }
+export async function uploadBookmarkFile(post: FormData) {
+  console.log(post);
+  console.log([...post.entries()]);
+  const url = `${server}/api/upload-all-chrome-bookmark`;
+  // console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "POST",
+    body: post,
+    credentials: "include",
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    console.log(info);
+    const error = new APIError(info.message, res.status, info);
+    throw error;
+  }
+  const data = await res.json();
+  console.log(data);
+  return data;
+}
