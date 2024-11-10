@@ -3,15 +3,18 @@ import { Upload } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { uploadBookmarkFile } from "../utils/http";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function UploadBookmarFile() {
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const navigate = useNavigate();
   const { mutate } = useMutation({
     mutationFn: uploadBookmarkFile,
     onSuccess: (data) => {
       toast.success("Bookmark Data Uploaded to Database");
       console.log(data);
+      navigate('/')
     },
     onError: (err) => {
       console.log(err.message);

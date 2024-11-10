@@ -165,11 +165,12 @@ export async function getMyProfile(navigate: NavigateFunction) {
       res.status,
       info
     );
-    navigate("/login");
+    navigate("/home");
     throw error;
   }
   const { data } = await res.json();
   console.log(data);
+  navigate('/')
   return data;
 }
 export async function getBookMarkByTopic(post: string) {
