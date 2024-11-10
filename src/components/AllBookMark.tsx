@@ -127,7 +127,7 @@ function AllBookMark() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100" style={{backgroundImage: 'radial-gradient(#cbd5e0 1.20px, transparent 1px)', backgroundSize: '20px 20px'}}>
       <Navbar login={true} />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
@@ -191,7 +191,7 @@ function AllBookMark() {
                     items={bookmark.map((b) => ({ id: b._id }))}
                     strategy={rectSortingStrategy}
                   >
-                    <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3" style={{backgroundImage: 'radial-gradient(#cbd5e0 1px, transparent 1px)', backgroundSize: '20px 20px'}}>
                       {bookmark.map((el) => (
                         <Bookmark
                           key={el._id}

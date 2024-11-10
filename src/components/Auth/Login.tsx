@@ -14,7 +14,7 @@ function Login() {
           Login
         </button> */}
       {/* </div> */}
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{backgroundImage: 'radial-gradient(#cbd5e0 1.20px, transparent 1px)', backgroundSize: '20px 20px'}}>
         <div className="w-full max-w-md p-6 rounded-2xl">
           <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
             Log in to DumpStore
