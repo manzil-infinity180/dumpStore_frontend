@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { NavigateFunction } from "react-router-dom";
 import { IRemaindar } from "../EditBookMark/UpdateBookmark";
+import toast from "react-hot-toast";
 export const queryclient = new QueryClient();
 const server = "http://localhost:3008";
 class APIError extends Error {
@@ -45,12 +46,22 @@ export interface IResponse {
 export async function createBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
+  console.log("hello Rahul -----------")
   console.log(post);
+  let filterData = post;
+  if (post?.calendar && typeof post.calendar === 'string') {
+    const filteredCalendar = JSON.parse(post.calendar);
+    console.log(filteredCalendar);
+    filterData.calendar = filteredCalendar
+    console.log(filterData);
+  } else {
+    console.error('post.calendar is not a string');
+  }
   const url = `${server}/api/create-bookmark`;
   // console.log(JSON.stringify(post));
   const res = await fetch(url, {
     method: "POST",
-    body: JSON.stringify(post),
+    body: JSON.stringify(filterData),
     credentials: "include",
     headers: {
       "Content-type": "application/json",
@@ -76,11 +87,20 @@ export async function updateBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
   console.log(post);
+  let filterData = post;
+  if (post?.calendar && typeof post.calendar === 'string') {
+    const filteredCalendar = JSON.parse(post.calendar);
+    console.log(filteredCalendar);
+    filterData.calendar = filteredCalendar
+    console.log(filterData);
+  } else {
+    console.error('post.calendar is not a string');
+  }
   const url = `${server}/api/update-bookmark`;
   // console.log(JSON.stringify(post));
   const res = await fetch(url, {
     method: "PATCH",
-    body: JSON.stringify(post),
+    body: JSON.stringify(filterData),
     credentials: "include",
     headers: {
       "Content-type": "application/json",
@@ -90,7 +110,7 @@ export async function updateBookmark(post: {
   if (!res.ok) {
     const info = await res.json();
     const error = new APIError(
-      "An error occurred while fetching the events",
+      info.message,
       res.status,
       info
     );
@@ -170,7 +190,7 @@ export async function getMyProfile(navigate: NavigateFunction) {
   }
   const { data } = await res.json();
   console.log(data);
-  navigate('/')
+  // navigate('/')
   return data;
 }
 export async function getBookMarkByTopic(post: string) {
@@ -385,7 +405,66 @@ export async function addRemainder(post :  IRemaindar) {
   if (!res.ok) {
     const info = await res.json();
     console.log(info);
-    window.open(`http://localhost:3008/auth/google`, "_self")
+    if(info.message.includes("No access, refresh token")){
+      window.open(`http://localhost:3008/auth/google`, "_self")
+    }
+    const error = new APIError(
+      "An error occurred while fetching the events",
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  console.log(data);
+  return data;
+}
+export async function updateRemainder(post :  IRemaindar) {
+  const url = `${server}/api/calendar/edit`;
+  console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "PATCH",
+    body: JSON.stringify(post),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    console.log(info);
+    if(info.message.includes("No access, refresh token")){
+      toast.error("Redirecting for authentication")
+      window.open(`http://localhost:3008/auth/google`, "_self")
+    }
+    const error = new APIError(
+      info.message,
+      res.status,
+      info
+    );
+    throw error;
+  }
+  const { data } = await res.json();
+  console.log(data);
+  return data;
+}
+export async function deleteRemainder(post :  {eventId: string, bookmarkId: string}) {
+  const url = `${server}/api/calendar/delete`;
+  console.log(JSON.stringify(post));
+  const res = await fetch(url, {
+    method: "DELETE",
+    body: JSON.stringify(post),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  // console.log(res);
+  if (!res.ok) {
+    const info = await res.json();
+    console.log(info);
+    toast.error("Redirecting for authentication");
+    if(info.message.includes("No access, refresh token")){
+      window.open(`http://localhost:3008/auth/google`, "_self")
+    }
+    
     const error = new APIError(
       "An error occurred while fetching the events",
       res.status,

@@ -6,20 +6,25 @@ import { IoMdAdd } from "react-icons/io";
 import {
   addRemainder,
   deleteBookmark,
+  deleteRemainder,
   getBookMark,
   queryclient,
   updateBookmark,
+  updateRemainder,
   uploadImageToCloud,
 } from "../utils/http";
 import { useNavigate, useParams } from "react-router-dom";
 import { IBookMark } from "../AllBookMark";
 import { useProfileData } from "../utils/useProfileData";
 import toast from "react-hot-toast";
+import { ICalendar } from "./CreateBookmark";
 export interface IRemaindar {
   summary : string;
   link: string
   endDate: string
   startDate : string
+  eventId?:string;
+  bookmarkId?:string
 }
 export default function UpdateBookmark() {
   const [tags, setTags] = useState<string[]>([]);
@@ -35,6 +40,7 @@ export default function UpdateBookmark() {
   const [endDate, setEndDate] = useState<string>("");
   const { bookmarkID } = useParams();
   const navigate = useNavigate();
+  const [calendarData, setCalendarData] = useState<ICalendar | null>(null);
   const [value, setValue] = useState<IBookMark>({
     _id: bookmarkID as string,
     title: "",
@@ -54,7 +60,8 @@ export default function UpdateBookmark() {
   const { mutate } = useMutation({
     mutationFn: updateBookmark,
     onSuccess: () => {
-      navigate("/");
+      toast.success("Updated Bookmark");
+      queryclient.invalidateQueries({ queryKey: ["bookmark", bookmarkID] });
     },
     onSettled: () => {
       queryclient.invalidateQueries({ queryKey: ["profile"] });
@@ -68,6 +75,13 @@ export default function UpdateBookmark() {
       setDescription(data.description);
       setSelectedTopics(data.topics);
       setTopics((s) => [...s, data.topics]);
+      if(data.calendar && data.calendar!== null){
+        setCalendarData(data.calendar);
+        const changeDateFormate = new Date(data.calendar.end).toISOString().substring(0,10);
+        setEndDate(changeDateFormate);
+        console.log(changeDateFormate);
+        console.log(endDate);
+      }
       // if(data.topics)
       console.log(data);
       return data;
@@ -87,6 +101,10 @@ export default function UpdateBookmark() {
     Object.keys(filteredData).forEach(
       (key) => filteredData[key] === "" && delete filteredData[key]
     );
+    if(calendarData!==null){
+      console.log(calendarData);
+     filteredData.calendar = JSON.stringify(calendarData);
+    }
     console.log(filteredData);
     console.log(data.image.includes("cloudinary"));
     mutate(filteredData);
@@ -176,9 +194,36 @@ export default function UpdateBookmark() {
   };
 
   const {mutate: calendarRemainderMutate} = useMutation({
-    mutationFn: addRemainder,
+    mutationFn: calendarData? updateRemainder: addRemainder,
     onSuccess: (data) => {
       console.log(data);
+      toast.success("Add/Updated Remainder");
+      queryclient.invalidateQueries({ queryKey: ["bookmark", bookmarkID] });
+      if(data === null) throw new Error("NO data found");
+      const calendar = {
+      kind: data.kind,
+      id: data.id,
+      htmlLink: data.htmlLink,
+      summary: data.summary,
+      description: data.description,
+      start: data.start.dateTime,
+      end:data.end.dateTime
+      }
+      console.log(calendar);
+      setCalendarData(calendar);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  })
+  const {mutate: calendarDeleteMutate} = useMutation({
+    mutationFn: deleteRemainder,
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Deleted Remainder");
+      queryclient.invalidateQueries({ queryKey: ["bookmark", bookmarkID] });
+      setCalendarData(null);
+      setEndDate("");
     },
     onError: (error) => {
       console.log(error);
@@ -198,8 +243,8 @@ export default function UpdateBookmark() {
     if (dateStart > dateEnd) {
       throw new Error("End date should be greater than start date");
     }
-  
-    const post = {
+    
+    let post: IRemaindar = {
       summary: value.title,
       link: value.link,
       endDate: dateEnd,
@@ -207,8 +252,18 @@ export default function UpdateBookmark() {
     };
   
     console.log("Post object:", JSON.stringify(post));
+    if(calendarData){
+      post.eventId = calendarData.id;
+      post.bookmarkId = value._id;
+    }
     calendarRemainderMutate(post)
   };
+  function handleDeleteRemainder(){
+    if(calendarData!==null && calendarData.id!==undefined){
+      const data = {eventId: calendarData.id, bookmarkId: value._id}
+      calendarDeleteMutate(data)
+    }
+  }
   return (
     <>
       {data && (
@@ -340,8 +395,10 @@ export default function UpdateBookmark() {
                 </label>
                 <input
                   value={endDate}
-                  onChange={(e) => setEndDate(e.currentTarget.value)}
+                  onChange={(e) => {console.log(e.currentTarget.value) 
+                    setEndDate(e.currentTarget.value)}}
                   type="date"
+                  data-testid={calendarData? calendarData.end : endDate}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                 />
                {endDate &&  <button
@@ -349,8 +406,17 @@ export default function UpdateBookmark() {
                       className="ml-1 px-3 py-4 bg-blue-500 text-white font-bold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
                       onClick={handleRemainder}
                     >
-                      Add Remainder
+                      {calendarData ?'Update' :'Add'} Remainder
                     </button>}
+                {
+                  calendarData && <button
+                  type="button"
+                  className="ml-1 px-3 py-4 bg-red-500 text-white font-bold rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
+                  onClick={handleDeleteRemainder}
+                >
+                  Delete Remainder
+                </button>
+                }
               </div>
               <div className="space-y-2">
                 <label

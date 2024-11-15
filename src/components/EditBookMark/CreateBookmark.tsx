@@ -11,7 +11,15 @@ import { useProfileData } from "../utils/useProfileData";
 import { useNavigate } from "react-router-dom";
 import Loader from "../utils/Loader";
 import toast from "react-hot-toast";
-
+export interface ICalendar{
+  kind?:string;
+  id?:string;
+  htmlLink?:string;
+  summary?:string;
+  description?:string;
+  start?:string;
+  end?:string
+}
 export default function UpdateBookmark() {
   const [title, setTitle] = useState("");
   const [link, setLink] = useState("");
@@ -25,6 +33,7 @@ export default function UpdateBookmark() {
   const [topics, setTopics] = useState<string[]>([]);
   const [uploadDisableBtn, setuploadDisableBtn] = useState(false);
   const [endDate, setEndDate] = useState<string>("");
+  const [calendarData, setCalendarData] = useState<ICalendar | null>(null)
   const [check, setCheck] = useState(true);
   const navigate = useNavigate();
   const profileData = useProfileData();
@@ -109,6 +118,10 @@ export default function UpdateBookmark() {
       (key) => filteredData[key] === "" && delete filteredData[key]
     );
     console.log(filteredData);
+    if(calendarData!==null && !check){
+      console.log(calendarData);
+     filteredData.calendar = JSON.stringify(calendarData);
+    }
 
     console.log(JSON.stringify(filteredData));
     mutate(filteredData);
@@ -181,7 +194,22 @@ export default function UpdateBookmark() {
     onSuccess: (data) => {
       console.log(data);
       toast.success("Added to Calendar")
+      // here i am saving the data
       setCheck(false);
+      // setCheck({check:data, added: false});
+      if(data === null) throw new Error("NO data found");
+      const calendar = {
+      kind: data.kind,
+      id: data.id,
+      htmlLink: data.htmlLink,
+      summary: data.summary,
+      description: data.description,
+      start: data.start.dateTime,
+      end:data.end.dateTime
+      }
+      console.log(calendar);
+      setCalendarData(calendar);
+      console.log(calendarData);
     },
     onError: (error) => {
       console.log(error);
