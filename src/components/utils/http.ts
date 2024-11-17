@@ -24,20 +24,6 @@ export interface IBookMark extends Document {
   topics?: string; // presently i perfer to go with optional
   image?: string;
 }
-/*
-"status": "sucess",
-    "message": "New Dump Data is Inserted",
-    "data": {
-        "title": "Typescript error",
-        "link": "https://javascript.info/custom-errors",
-        "tag": "education",
-        "image": "https://img.logo.dev/javascript.info?token=pk_PCz2SULwSFWmMvaP_SIfXg&size=150&format=png",
-        "_id": "67003c927c84ab4b1b3cee25",
-        "createdAt": "2024-10-04T19:05:54.817Z",
-        "updatedAt": "2024-10-04T19:05:54.817Z",
-        "__v": 0
-    }
-*/
 export interface IResponse {
   message: string;
   status: string;
