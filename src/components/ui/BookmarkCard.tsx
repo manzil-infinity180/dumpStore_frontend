@@ -17,7 +17,7 @@ interface IBookMark {
 
 function BookmarkCard({
   data,
-  uploadDisableBtn,
+  uploadDisableBtn, // this is tooltip for showing description when we are hoving to any bookmark
 }: {
   data: IBookMark;
   uploadDisableBtn: boolean;

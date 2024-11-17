@@ -87,6 +87,9 @@ function AllBookMark() {
     onSettled: () => {
       queryclient.invalidateQueries({ queryKey: ["all-bookmark"] });
     },
+    onError: (error) => {
+      toast.error(error.message);
+    }
   });
 
   const handleDragStart = (event: DragStartEvent) => {

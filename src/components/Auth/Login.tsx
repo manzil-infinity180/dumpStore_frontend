@@ -4,16 +4,6 @@ import { GoArrowUpRight } from "react-icons/go";
 function Login() {
   return (
     <>
-      {/* <div>
-        <button
-          className="w-1/4 p-2 rounded-xl bg-slate-400"
-          onClick={() =>
-            window.open("http://localhost:3008/auth/google", "_self")
-          }
-        >
-          Login
-        </button> */}
-      {/* </div> */}
       <div className="min-h-screen flex items-center justify-center p-4" style={{backgroundImage: 'radial-gradient(#cbd5e0 1.20px, transparent 1px)', backgroundSize: '20px 20px'}}>
         <div className="w-full max-w-md p-6 rounded-2xl">
           <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
@@ -42,7 +32,7 @@ function Login() {
 export default Login;
 
 export function AuthBox() {
-  const url = `http://localhost:3008/auth`;
+  const url = `${import.meta.env.VITE_SERVER_URL}/auth`;
   return (
     <>
       <button
