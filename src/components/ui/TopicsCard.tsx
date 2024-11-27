@@ -8,6 +8,7 @@ import {
   queryclient,
 } from "../utils/http";
 import { type IBookMark, type TtopicsOrder } from "../AllBookMark";
+import toast from "react-hot-toast";
 
 interface ITopicsCard {
   topics: string;
@@ -22,10 +23,8 @@ function TopicsCard({
 }: ITopicsCard) {
   const { mutate } = useMutation({
     mutationFn: getBookMarkByTopic,
-    onSuccess: () => {
-      console.log("Bookmarks fetched successfully");
-    },
     onSettled: (data) => {
+      // ISSUE: need to change the logic for this because we want to bookmark at top which is recently created
       data.sort((a: IBookMark, b: IBookMark) => {
         if (
           a.topics_position !== undefined &&
@@ -41,16 +40,22 @@ function TopicsCard({
       setBookmark(data);
       setManageTopicsOrder("topics");
     },
+    onError: (error) => {
+      toast.error(error.message);
+    }
   });
 
   const { mutate: deleteAllTopicsMutate } = useMutation({
     mutationFn: deleteAllBookmarkByTopics,
     onSuccess: () => {
-      console.log("Topic and related bookmarks deleted successfully");
+      toast.success("Topic and related bookmarks deleted successfully");
     },
     onSettled: () => {
       queryclient.invalidateQueries();
     },
+    onError: (error) => {
+      toast.error(error.message);
+    }
   });
 
   function handleFunction(e: React.MouseEvent) {

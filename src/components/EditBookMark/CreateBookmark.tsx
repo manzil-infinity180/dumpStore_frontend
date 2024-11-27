@@ -51,11 +51,13 @@ export default function UpdateBookmark() {
     onSettled: () => {
       queryclient.invalidateQueries({ queryKey: ["profile"] });
     },
+    onError: (error) => {
+      toast.error(error.message);
+    }
   });
   const { mutate: UploadImageMutate } = useMutation({
     mutationFn: uploadImageToCloud,
     onSuccess: (uploadImageUrl) => {
-      console.log("Yeah bro upload it!!!!!!!!");
       const { imageUrl } = uploadImageUrl;
       if (imageUrl.length) {
         setCloudImage(imageUrl);
@@ -70,9 +72,6 @@ export default function UpdateBookmark() {
   const { mutate: generateMuate } = useMutation({
     mutationFn: generateTagAndDescription,
     onSuccess: (data) => {
-      console.log(data);
-      // setDescription(data.result[0].summary_text);
-      // setTags(data.tags);
 
       setDescription(data.summary);
       setTags(data.tags);
@@ -80,8 +79,7 @@ export default function UpdateBookmark() {
       setuploadDisableBtn(false);
       toast.success("Generated  ✅");
     },
-    onError: (err) => {
-      console.log(err);
+    onError: () => {
       setuploadDisableBtn(false);
       toast.error("failed to generate, try after some time");
     },
@@ -97,42 +95,30 @@ export default function UpdateBookmark() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
-    console.log({ title, link, description, image });
     const formdata = new FormData(e.currentTarget);
     if (tag1.length) {
       const arr = [...tags, tag1];
-      console.log(arr);
       setTags(arr);
-      console.log(tags);
     }
     formdata.append("tag", tags.join(","));
     if (cloudImage.length) {
-      console.log(cloudImage);
       formdata.append("image", cloudImage);
     }
-    console.log(tags);
-    console.log(tag1);
-    console.log(formdata);
     const filteredData = Object.fromEntries(formdata.entries());
     Object.keys(filteredData).forEach(
       (key) => filteredData[key] === "" && delete filteredData[key]
     );
-    console.log(filteredData);
     if(calendarData!==null && !check){
-      console.log(calendarData);
      filteredData.calendar = JSON.stringify(calendarData);
     }
 
-    console.log(JSON.stringify(filteredData));
     mutate(filteredData);
-    console.log(import.meta.env.VITE_LOGO_FAVICON_URL);
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
       setuploadDisableBtn(true);
-      console.log(image);
     }
   };
   const handleTopicsChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -151,15 +137,12 @@ export default function UpdateBookmark() {
     }
   };
   const handleCustomTagChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log(e.key);
     if (
       e.key === "Enter" &&
       e.currentTarget.value &&
       !tags.includes(e.currentTarget.value)
     ) {
       setTags([...tags, e.currentTarget.value]);
-      console.log(tags);
-      console.log(e.currentTarget.value);
       e.currentTarget.value = "";
       setTags1("");
     }
@@ -169,13 +152,9 @@ export default function UpdateBookmark() {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
   const handleImageUpload = () => {
-    console.log(image);
     if (image !== null) {
       const formdata = new FormData();
-      console.log(image);
       formdata.append("photo", image);
-      console.log(formdata.getAll("photo"));
-      console.log(formdata);
       const category = Object.fromEntries(formdata);
       if (!category) {
         throw new Error("Something went work");
@@ -192,7 +171,6 @@ export default function UpdateBookmark() {
   const {mutate: calendarRemainderMutate} = useMutation({
     mutationFn: addRemainder,
     onSuccess: (data) => {
-      console.log(data);
       toast.success("Added to Calendar")
       // here i am saving the data
       setCheck(false);
@@ -207,12 +185,9 @@ export default function UpdateBookmark() {
       start: data.start.dateTime,
       end:data.end.dateTime
       }
-      console.log(calendar);
       setCalendarData(calendar);
-      console.log(calendarData);
     },
-    onError: (error) => {
-      console.log(error);
+    onError: () => {
       toast.error("Redirect for authorization");
     }
   })
@@ -236,9 +211,7 @@ export default function UpdateBookmark() {
       link: link,
       endDate: dateEnd,
       startDate: dateStart
-    };
-  
-    console.log("Post object:", JSON.stringify(post));
+    };  
     calendarRemainderMutate(post)
   };
 

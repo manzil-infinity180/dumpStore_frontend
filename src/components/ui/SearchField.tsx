@@ -11,10 +11,8 @@ function SearchField({ setBookmark }: ISearchField) {
   const { mutate } = useMutation({
     mutationFn: getBookmarkFromSearch,
     onSuccess: () => {
-      console.log("hello");
     },
     onSettled: (data) => {
-      console.log("settled");
       if (data.length === 0) {
         toast.success("No data available");
         setSearchField("");
@@ -24,8 +22,9 @@ function SearchField({ setBookmark }: ISearchField) {
       toast.success(`${data.length} data received`);
       setSearchField("");
     },
-    onError: () => {
+    onError: (error) => {
       toast.error("Something went wrong with the search field");
+      toast.error(error.message);
     },
   });
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -35,7 +34,6 @@ function SearchField({ setBookmark }: ISearchField) {
     }
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
-    console.log(data);
     mutate(data);
   }
   return (

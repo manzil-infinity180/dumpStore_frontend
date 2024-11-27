@@ -66,6 +66,9 @@ export default function UpdateBookmark() {
     onSettled: () => {
       queryclient.invalidateQueries({ queryKey: ["profile"] });
     },
+    onError: (error) => {
+      toast.error(error.message);
+    }
   });
   const { data } = useQuery({
     queryKey: ["bookmark", bookmarkID],
@@ -79,11 +82,8 @@ export default function UpdateBookmark() {
         setCalendarData(data.calendar);
         const changeDateFormate = new Date(data.calendar.end).toISOString().substring(0,10);
         setEndDate(changeDateFormate);
-        console.log(changeDateFormate);
-        console.log(endDate);
       }
       // if(data.topics)
-      console.log(data);
       return data;
     },
   });
@@ -102,16 +102,12 @@ export default function UpdateBookmark() {
       (key) => filteredData[key] === "" && delete filteredData[key]
     );
     if(calendarData!==null){
-      console.log(calendarData);
      filteredData.calendar = JSON.stringify(calendarData);
     }
-    console.log(filteredData);
-    console.log(data.image.includes("cloudinary"));
     mutate(filteredData);
   };
   async function handleDeleteBookMark() {
-    const data = await deleteBookmark(bookmarkID as string);
-    console.log(data);
+    await deleteBookmark(bookmarkID as string);
     navigate("/");
   }
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -123,7 +119,6 @@ export default function UpdateBookmark() {
   const { mutate: UploadImageMutate } = useMutation({
     mutationFn: uploadImageToCloud,
     onSuccess: (uploadImageUrl) => {
-      console.log("Yeah bro upload it!!!!!!!!");
       const { imageUrl } = uploadImageUrl;
       if (imageUrl.length) {
         setCloudImage(imageUrl);
@@ -131,8 +126,8 @@ export default function UpdateBookmark() {
       }
       toast.success("Updated your bookmark");
     },
-    onError: () => {
-      toast.error("Something went wrong");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -177,13 +172,9 @@ export default function UpdateBookmark() {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
   const handleImageUpload = () => {
-    console.log(image);
     if (image !== null) {
       const formdata = new FormData();
-      console.log(image);
       formdata.append("photo", image);
-      console.log(formdata.getAll("photo"));
-      console.log(formdata);
       const category = Object.fromEntries(formdata);
       if (!category) {
         throw new Error("Something went work");
@@ -196,7 +187,6 @@ export default function UpdateBookmark() {
   const {mutate: calendarRemainderMutate} = useMutation({
     mutationFn: calendarData? updateRemainder: addRemainder,
     onSuccess: (data) => {
-      console.log(data);
       toast.success("Add/Updated Remainder");
       queryclient.invalidateQueries({ queryKey: ["bookmark", bookmarkID] });
       if(data === null) throw new Error("NO data found");
@@ -209,7 +199,7 @@ export default function UpdateBookmark() {
       start: data.start.dateTime,
       end:data.end.dateTime
       }
-      console.log(calendar);
+
       setCalendarData(calendar);
     },
     onError: (error) => {
@@ -218,15 +208,14 @@ export default function UpdateBookmark() {
   })
   const {mutate: calendarDeleteMutate} = useMutation({
     mutationFn: deleteRemainder,
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       toast.success("Deleted Remainder");
       queryclient.invalidateQueries({ queryKey: ["bookmark", bookmarkID] });
       setCalendarData(null);
       setEndDate("");
     },
     onError: (error) => {
-      console.log(error);
+      toast.error(error.message);
     }
   })
   const handleRemainder = async () => {
@@ -251,7 +240,6 @@ export default function UpdateBookmark() {
       startDate: dateStart
     };
   
-    console.log("Post object:", JSON.stringify(post));
     if(calendarData){
       post.eventId = calendarData.id;
       post.bookmarkId = value._id;
@@ -395,8 +383,7 @@ export default function UpdateBookmark() {
                 </label>
                 <input
                   value={endDate}
-                  onChange={(e) => {console.log(e.currentTarget.value) 
-                    setEndDate(e.currentTarget.value)}}
+                  onChange={(e) => setEndDate(e.currentTarget.value)}
                   type="date"
                   data-testid={calendarData? calendarData.end : endDate}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
