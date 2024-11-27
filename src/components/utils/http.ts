@@ -21,7 +21,7 @@ export interface IResponse {
 export async function createBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
-  let filterData = post;
+  const filterData = post;
   if (post?.calendar && typeof post.calendar === 'string') {
     const filteredCalendar = JSON.parse(post.calendar);
     filterData.calendar = filteredCalendar
@@ -48,7 +48,7 @@ export async function createBookmark(post: {
 export async function updateBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
-  let filterData = post;
+  const filterData = post;
   if (post?.calendar && typeof post.calendar === 'string') {
     const filteredCalendar = JSON.parse(post.calendar);
     filterData.calendar = filteredCalendar
@@ -92,8 +92,8 @@ export async function getAllBookmark() {
 export async function getMyProfile(navigate: NavigateFunction) {
   const url = `${server}/api/get-my-profile`;
   const res = await getCallMethod(url);
-  if(!res.ok){
-    await CustomErrorMessage(res,undefined, navigate, '/home');
+  if (!res.ok) {
+    await CustomErrorMessage(res, undefined, navigate, '/home');
   }
   const { data } = await res.json();
   // navigate('/')
@@ -226,7 +226,7 @@ export async function uploadImageToCloud(post: FormData) {
   return data;
 }
 
-export async function addRemainder(post :  IRemaindar) {
+export async function addRemainder(post: IRemaindar) {
   const url = `${server}/api/calendar`;
   const res = await fetch(url, {
     method: "POST",
@@ -236,7 +236,7 @@ export async function addRemainder(post :  IRemaindar) {
   });
   if (!res.ok) {
     const info = await res.json();
-    if(info.message.includes("No access, refresh token")){
+    if (info.message.includes("No access, refresh token")) {
       window.open(`${server}/auth/google`, "_self")
     }
     const error = new APIError(
@@ -249,7 +249,7 @@ export async function addRemainder(post :  IRemaindar) {
   const { data } = await res.json();
   return data;
 }
-export async function updateRemainder(post :  IRemaindar) {
+export async function updateRemainder(post: IRemaindar) {
   const url = `${server}/api/calendar/edit`;
   const res = await fetch(url, {
     method: "PATCH",
@@ -259,7 +259,7 @@ export async function updateRemainder(post :  IRemaindar) {
   });
   if (!res.ok) {
     const info = await res.json();
-    if(info.message.includes("No access, refresh token")){
+    if (info.message.includes("No access, refresh token")) {
       toast.error("Redirecting for authentication")
       window.open(`${server}/auth/google`, "_self")
     }
@@ -273,7 +273,7 @@ export async function updateRemainder(post :  IRemaindar) {
   const { data } = await res.json();
   return data;
 }
-export async function deleteRemainder(post :  {eventId: string, bookmarkId: string}) {
+export async function deleteRemainder(post: { eventId: string, bookmarkId: string }) {
   const url = `${server}/api/calendar/delete`;
   const res = await fetch(url, {
     method: "DELETE",
@@ -284,10 +284,10 @@ export async function deleteRemainder(post :  {eventId: string, bookmarkId: stri
   if (!res.ok) {
     const info = await res.json();
     toast.error("Redirecting for authentication");
-    if(info.message.includes("No access, refresh token")){
+    if (info.message.includes("No access, refresh token")) {
       window.open(`${server}/auth/google`, "_self")
     }
-    
+
     const error = new APIError(
       "An error occurred while fetching the events",
       res.status,
