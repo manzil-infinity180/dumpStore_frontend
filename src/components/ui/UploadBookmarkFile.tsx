@@ -11,14 +11,12 @@ export default function UploadBookmarFile() {
   const navigate = useNavigate();
   const { mutate } = useMutation({
     mutationFn: uploadBookmarkFile,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Bookmark Data Uploaded to Database");
-      console.log(data);
       navigate('/')
     },
-    onError: (err) => {
-      console.log(err.message);
-      toast.error(err.message);
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
