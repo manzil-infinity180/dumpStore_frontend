@@ -34,7 +34,7 @@ export async function createBookmark(post: {
 }) {
   console.log("hello Rahul -----------")
   console.log(post);
-  let filterData = post;
+  const filterData = post;
   if (post?.calendar && typeof post.calendar === 'string') {
     const filteredCalendar = JSON.parse(post.calendar);
     console.log(filteredCalendar);
@@ -73,7 +73,7 @@ export async function updateBookmark(post: {
   [k: string]: FormDataEntryValue;
 }) {
   console.log(post);
-  let filterData = post;
+  const filterData = post;
   if (post?.calendar && typeof post.calendar === 'string') {
     const filteredCalendar = JSON.parse(post.calendar);
     console.log(filteredCalendar);

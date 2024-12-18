@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 // import Home from "./components/Home";
 import { QueryClientProvider } from "@tanstack/react-query";
 import AllBookMark from "./components/AllBookMark";
@@ -18,7 +18,7 @@ function App() {
   });
   const router = createBrowserRouter([
     {
-      path: "*",
+      path: "/",
       element: (
         <UserProfileData>
           <AllBookMark />
@@ -56,6 +56,10 @@ function App() {
     {
       path: "/home",
       element: <LandingPage />
+    },
+    {
+      path: "*",
+      element: <Navigate to="/home" replace />,
     },
   ]);
   return (
