@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import TooltipDescription from "./TooltipDescription";
 
 interface IBookMark {
   _id: string;
@@ -17,10 +16,8 @@ interface IBookMark {
 
 function BookmarkCard({
   data,
-  uploadDisableBtn,
 }: {
-  data: IBookMark;
-  uploadDisableBtn: boolean;
+  data: IBookMark
 }) {
   const { setNodeRef, attributes, listeners, transform, transition } =
     useSortable({ id: data._id });

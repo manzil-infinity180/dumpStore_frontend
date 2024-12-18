@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { CheckIcon, StarIcon, BookmarkIcon, CalendarIcon, UploadIcon, DrumIcon as DragIcon, TagIcon, Github, Twitter, Linkedin } from 'lucide-react';
+import { CheckIcon, StarIcon, BookmarkIcon, CalendarIcon, UploadIcon, DrumIcon as DragIcon, TagIcon, Github, Linkedin } from 'lucide-react';
 import { FaXTwitter } from "react-icons/fa6";
 
 const features = [
@@ -17,64 +17,6 @@ const reviews = [
   { name: "Jane Smith", rating: 4, text: "Great service, the AI-powered summaries are a game-changer." },
   { name: "Mike Johnson", rating: 5, text: "The Chrome extension makes importing a breeze. Highly recommended!" }
 ];
-
-const platforms = [
-  { name: 'Chrome', icon: '/chrome-icon.svg', size: 16, position: { left: '44%', top: '32%' } },
-  { name: 'Twitter', icon: '/twitter-icon.svg', size: 12, position: { left: '85%', top: '40%' } },
-  { name: 'Reddit', icon: '/reddit-icon.svg', size: 12, position: { left: '75%', top: '20%' } },
-  { name: 'LinkedIn', icon: '/linkedin-icon.svg', size: 12, position: { left: '25%', top: '40%' } },
-  { name: 'Gmail', icon: '/gmail-icon.svg', size: 12, position: { left: '15%', top: '56%' } },
-  { name: 'Calendar', icon: '/calendar-icon.svg', size: 12, position: { left: '65%', top: '70%' } }
-];
-
-const FloatingIcons: React.FC = () => {
-  return (
-    <div className="relative h-80 shrink-0">
-      <div aria-hidden="true" className="relative h-full overflow-hidden">
-        <div className="absolute inset-0">
-          {[528, 400, 272, 149].map((size, i) => (
-            <div
-              key={size}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,transparent_25%,color-mix(in_srgb,_theme(colors.blue.500)_var(--opacity),transparent)_100%)] ring-1 ring-inset ring-blue-500/[8%]"
-              style={{
-                '--opacity': `${(i + 1) * 3}%`,
-                width: `${size}px`,
-                height: `${size}px`
-              } as React.CSSProperties}
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-white to-35%" />
-        </div>
-        <div className="absolute left-1/2 h-full w-[26rem] -translate-x-1/2">
-          <div className="absolute left-44 top-32 flex size-16 items-center justify-center rounded-full bg-white shadow ring-1 ring-black/5">
-            <img
-              src="/placeholder.svg"
-              alt="Dumpstore logo"
-              className="w-14 h-14 rounded-full object-contain"
-            />
-          </div>
-          {platforms.map((platform) => (
-            <div
-              key={platform.name}
-              className="absolute flex items-center justify-center rounded-xl bg-white shadow ring-1 ring-black/5"
-              style={{
-                width: `${platform.size * 0.75}rem`,
-                height: `${platform.size * 0.75}rem`,
-                ...platform.position
-              }}
-            >
-              <img
-                src={platform.icon}
-                alt={`${platform.name} icon`}
-                className="w-9 h-9 rounded-md object-contain"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const LandingPage: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly' | 'free'>('free');

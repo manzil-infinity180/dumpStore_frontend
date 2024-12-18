@@ -50,7 +50,7 @@ export type TtopicsOrder = "all" | "topics";
 
 function AllBookMark() {
   const [bookmark, setBookmark] = useState<IBookMark[]>([]);
-  const [activeItem, setActiveItem] = useState<IBookMark | undefined>();
+  const [, setActiveItem] = useState<IBookMark | undefined>();
   const [orderState, setOrderstate] = useState(false);
   const [uploadDisableBtn, setUploadDisableBtn] = useState(false);
   const [manageTopicsOrder, setManageTopicsOrder] =
